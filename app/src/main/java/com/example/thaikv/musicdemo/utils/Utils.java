@@ -1,5 +1,10 @@
 package com.example.thaikv.musicdemo.utils;
 
+import android.app.ActivityManager;
+import android.content.Context;
+
+import static android.content.Context.ACTIVITY_SERVICE;
+
 public class Utils {
 
     public static String formatTime(long milliseconds){
@@ -25,5 +30,18 @@ public class Utils {
 
         // return timer string
         return finalTimerString;
+    }
+
+    public  static boolean checkServiceRuning(Context context){
+        ActivityManager manager = (ActivityManager)  context.getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+        {
+            if ("com.example.thaikv.musicdemo.services.PlayTrackService"
+                    .equals(service.service.getClassName()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

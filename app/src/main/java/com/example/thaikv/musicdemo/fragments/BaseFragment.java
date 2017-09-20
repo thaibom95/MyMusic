@@ -21,6 +21,7 @@ public abstract class BaseFragment<T> extends Fragment implements BaseAdapter.On
     protected BaseAdapter baseAdapter;
     protected ArrayList<T> arrayList;
 
+
     private int idLayout;
     private int idRecyclerView;
     private int idProgressBar;

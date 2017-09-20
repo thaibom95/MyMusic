@@ -23,7 +23,7 @@ import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
 import com.example.thaikv.musicdemo.adapters.ViewPagerAdapter;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private DrawerLayout drawer;
