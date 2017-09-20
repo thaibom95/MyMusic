@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/pbg_browser__webview"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:max="100"
+        android:progress="30"
+        android:progressDrawable="@drawable/progress_drawable_searching"
+        android:progressTint="#ffffff" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBgkHeader">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civ_thumbnail"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_music_default" />
+
+        <ImageView
+            android:id="@+id/iv_play_pause"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_play"
+            android:tint="@color/colorTextTitle" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/iv_play_pause"
+            android:layout_toRightOf="@+id/civ_thumbnail"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_name_song"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="bottom"
+                android:maxLines="1"
+                android:paddingLeft="8dp"
+                android:text="Lac troi"
+                android:textColor="@color/colorTextTitle"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_artist"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="top"
+                android:maxLines="1"
+                android:paddingLeft="8dp"
+                android:text="Son Tung MTP"
+                android:textColor="@color/colorTextSubTitle"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

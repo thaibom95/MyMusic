@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bgk_fragment_folder"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/pgb_loading_folders"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_create_new"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorCreateFolder"
+        android:gravity="center"
+        android:text="Set this as Default Folder"
+        android:textColor="@color/colorTextTitle" />
+
+    <RelativeLayout
+        android:id="@+id/rll_back_folder"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@+id/tv_create_new">
+
+        <ImageView
+            android:id="@+id/iv_thumbnail"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_folder_back"
+            android:tint="@color/colorTextTitle" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/iv_thumbnail"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp"
+            android:text="..."
+            android:textColor="@color/colorTextTitle"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rcv_folders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rll_back_folder" />
+</RelativeLayout>
