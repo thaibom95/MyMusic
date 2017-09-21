@@ -12,4 +12,6 @@
     <color name="colorBgkDark">#401313</color>
     <color name="colorTransparent">#00ffffff</color>
     <color name="colorIcon">#848484</color>
+    <color name="black_translucent">#66000000</color>
+    <color name="colorSelectableItemWhite">#77ffffff</color>
 </resources>

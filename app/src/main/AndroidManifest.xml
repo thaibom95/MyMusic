@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
 
     <application
         android:name=".App"
@@ -29,7 +30,40 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".BaseActivity"></activity>
+        <activity android:name=".BaseActivity" />
+
+        <!--<receiver-->
+            <!--android:name=".widget.MyReceiver"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true"></receiver>-->
+        <!--<receiver-->
+            <!--android:name=".widget.SmallWidget"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true"></receiver>-->
+        <receiver
+            android:name=".widget.StandardWidget"
+            android:label="@string/widget_standard"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <!--<action android:name="com.naman14.timber.metachanged" />-->
+                <!--<action android:name="com.naman14.timber.playstatechanged" />-->
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_standard" />
+        </receiver>
+
+        <receiver android:name=".widget.SmallWidget" android:label="@string/widget_small">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <!--<action android:name="com.naman14.timber.metachanged" />-->
+                <!--<action android:name="com.naman14.timber.playstatechanged" />-->
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_small" />
+        </receiver>
+
     </application>
 
 </manifest>
