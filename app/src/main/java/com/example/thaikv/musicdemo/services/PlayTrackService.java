@@ -3,9 +3,12 @@ package com.example.thaikv.musicdemo.services;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -23,18 +26,22 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.utils.NavigationUtils;
 import com.example.thaikv.musicdemo.utils.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PlayTrackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
 
+    private static final String TAG = "PlayTrackService";
     public static final String PREFIX = "com.example.thaikv.musicdemo.";
 
     public static final String PREVIOUS_ACTION = PREFIX + "previous";
@@ -42,6 +49,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
     public static final String NEXT_ACTION = PREFIX + "next";
     public static final String TOGGLEPAUSE_ACTION = PREFIX + "togglepause";
+    public static final String REPEAT_ACTION = PREFIX+"repeat";
+    public static final String SHUFFLE_ACTION = PREFIX+"shuffle";
 
 
     //repeat mode
@@ -75,11 +84,34 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     private int indexSong;
     private int repeatMode = 0;
     private int shuffleMode = 0;
-    private int typeCurrentListSongs = -1;
+    private int mRepeatMode = REPEAT_NONE;
+    private int mShuffleMode = SHUFFLE_NONE;
 
+    private int typeCurrentListSongs = -1;
+    private int playBackCurrentPos = 0;
+    private AudioManager mAudioManager;
+
+    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+
+
+            handleCommandIntent(intent);
+
+        }
+    };
 
     public PlayTrackService() {
     }
+
+    private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+
+        @Override
+        public void onAudioFocusChange(final int focusChange) {
+          //  mPlayerHandler.obtainMessage(FOCUSCHANGE, focusChange, 0).sendToTarget();
+        }
+    };
 
     public ArrayList<SongMusicStruct> getListSongPlay() {
         return listSongPlay;
@@ -115,6 +147,19 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         mNotificationManager = NotificationManagerCompat.from(this);
         indexSong = 0;
         initPlayer();
+        final IntentFilter filter = new IntentFilter();
+       // filter.addAction(SERVICECMD);
+        filter.addAction(TOGGLEPAUSE_ACTION);
+//        filter.addAction(PAUSE_ACTION);
+//        filter.addAction(STOP_ACTION);
+        filter.addAction(NEXT_ACTION);
+        filter.addAction(PREVIOUS_ACTION);
+        filter.addAction(PREVIOUS_FORCE_ACTION);
+        filter.addAction(REPEAT_ACTION);
+        filter.addAction(SHUFFLE_ACTION);
+        // Attach the broadcast listener
+        registerReceiver(mIntentReceiver, filter);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
     }
 
@@ -123,6 +168,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     public void onDestroy() {
         super.onDestroy();
         mediaPlayer.release();
+        unregisterReceiver(mIntentReceiver);
 
     }
 
@@ -140,6 +186,13 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void playSongService() {
+        playBackCurrentPos = 0;
+        int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+        if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            return;
+        }
 
         mediaPlayer.reset();
 
@@ -154,7 +207,16 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         mediaPlayer.prepareAsync();
     }
 
+
+    public void playBackSongService(){
+        if(mediaPlayer != null &&  playBackCurrentPos < mediaPlayer.getCurrentPosition()){
+            mediaPlayer.seekTo(playBackCurrentPos);
+            mediaPlayer.start();
+        }
+    }
+
     public void pauseSongService() {
+        playBackCurrentPos = mediaPlayer.getCurrentPosition();
         mediaPlayer.pause();
     }
 
@@ -170,6 +232,23 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void nextSongService() {
+        if(indexSong < listSongPlay.size()-1){
+            indexSong++;
+        }
+        else
+            indexSong = 0;
+        songPlay = listSongPlay.get(indexSong);
+        playSongService();
+
+    }
+    public void preveSongService() {
+        if(indexSong > 0){
+            indexSong--;
+        }
+        else
+            indexSong = listSongPlay.size()-1;
+        songPlay = listSongPlay.get(indexSong);
+        playSongService();
 
     }
 
@@ -235,14 +314,16 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
         Intent nowPlayingIntent = NavigationUtils.getHomeIntent(this);
         PendingIntent clickIntent = PendingIntent.getActivity(this, 0, nowPlayingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        final Bitmap[] artwork = new Bitmap[1];
+        final Bitmap[] artwork = {null};
         long albumId = songPlay.getIdAlbum();
         if (albumId != -1) {
+
             Uri uri_image = Utils.getAlbumArtUri(albumId);
             Picasso.with(getApplicationContext()).load(uri_image).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     artwork[0] = bitmap;
+                    Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -256,11 +337,13 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                 }
             });
 
+           // artwork = ImageLoader.getInstance().loadImageSync( Utils.getAlbumArtUri(albumId).toString());
+            if (artwork[0] == null) {
+                artwork[0] = Utils.drawableToBitmap(getResources().getDrawable(R.drawable.ic_empty_music2));
+            }
         }
 
-        if (artwork[0] == null) {
-            Utils.drawableToBitmap(getResources().getDrawable(R.drawable.ic_empty_music2));
-        }
+
 
         if (mNotificationPostTime == 0) {
             mNotificationPostTime = System.currentTimeMillis();
@@ -300,6 +383,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     private final PendingIntent retrievePlaybackAction(final String action) {
+
+        Toast.makeText(getApplicationContext(),"click"+action,Toast.LENGTH_SHORT).show();
         final ComponentName serviceName = new ComponentName(this, PlayTrackService.class);
         Intent intent = new Intent(action);
         intent.setComponent(serviceName);
@@ -347,6 +432,55 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         mNotificationManager.cancel(hashCode());
         mNotificationPostTime = 0;
         mNotifyMode = NOTIFY_MODE_NONE;
+    }
+
+
+    private void handleCommandIntent(Intent intent) {
+        final String action = intent.getAction();
+
+
+        Log.d(TAG, "===== handleCommandIntent: action = " + action );
+
+
+        if (NEXT_ACTION.equals(action)) {
+            nextSongService();
+        } else if (PREVIOUS_ACTION.equals(action)
+                || PREVIOUS_FORCE_ACTION.equals(action)) {
+            preveSongService();
+        } else if (TOGGLEPAUSE_ACTION.equals(action)) {
+            if (isPlayingSong()) {
+                pauseSongService();
+
+            } else {
+               playBackSongService();
+            }
+        } else if (REPEAT_ACTION.equals(action)) {
+            cycleRepeat();
+        } else if (SHUFFLE_ACTION.equals(action)) {
+            cycleShuffle();
+        }
+    }
+
+    private void cycleRepeat() {
+        if (mRepeatMode == REPEAT_NONE) {
+            setRepeatMode(REPEAT_CURRENT);
+            if (mShuffleMode != SHUFFLE_NONE) {
+                setShuffleMode(SHUFFLE_NONE);
+            }
+        } else {
+            setRepeatMode(REPEAT_NONE);
+        }
+    }
+
+    private void cycleShuffle() {
+        if (mShuffleMode == SHUFFLE_NONE) {
+            setShuffleMode(SHUFFLE_NORMAL);
+//            if (mRepeatMode == REPEAT_CURRENT) {
+//                setRepeatMode(REPEAT_ALL);
+//            }
+        } else if (mShuffleMode == SHUFFLE_NORMAL || mShuffleMode == SHUFFLE_AUTO) {
+            setShuffleMode(SHUFFLE_NONE);
+        }
     }
 
 }
