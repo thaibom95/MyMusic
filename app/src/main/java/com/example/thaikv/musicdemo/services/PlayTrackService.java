@@ -199,6 +199,22 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 songPlay.getIdSong());
+        Picasso.with(getApplicationContext()).load(Utils.getAlbumArtUri(songPlay.getIdAlbum())).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
         try {
             mediaPlayer.setDataSource(getApplicationContext(), trackUri);
         } catch (Exception e) {
@@ -209,7 +225,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
 
     public void playBackSongService(){
-        if(mediaPlayer != null &&  playBackCurrentPos < mediaPlayer.getCurrentPosition()){
+        if(mediaPlayer != null &&  playBackCurrentPos < mediaPlayer.getDuration()){
             mediaPlayer.seekTo(playBackCurrentPos);
             mediaPlayer.start();
         }
@@ -278,6 +294,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
+        nextSongService();
 
     }
 
@@ -302,6 +319,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
 
+
+
     private Notification buildNotification() {
         final String albumName = songPlay.getAlbum();
         final String artistName = songPlay.getArtist();
@@ -323,7 +342,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     artwork[0] = bitmap;
-                    Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -383,48 +401,48 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     private final PendingIntent retrievePlaybackAction(final String action) {
-
-        Toast.makeText(getApplicationContext(),"click"+action,Toast.LENGTH_SHORT).show();
-        final ComponentName serviceName = new ComponentName(this, PlayTrackService.class);
         Intent intent = new Intent(action);
-        intent.setComponent(serviceName);
-
-        return PendingIntent.getService(this, 0, intent, 0);
+        return PendingIntent.getBroadcast(this, 0, intent, 0);
     }
 
 
     private void updateNotification() {
-        final int newNotifyMode;
-        if (isPlayingSong()) {
-            newNotifyMode = NOTIFY_MODE_FOREGROUND;
-        }
-//        else if (recentlyPlayed()) {
-//            newNotifyMode = NOTIFY_MODE_BACKGROUND;
-//        }
-        else {
-            newNotifyMode = NOTIFY_MODE_NONE;
-        }
-
         int notificationId = hashCode();
-        if (mNotifyMode != newNotifyMode) {
-            if (mNotifyMode == NOTIFY_MODE_FOREGROUND) {
-                if (Utils.isLollipop())
-                    stopForeground(newNotifyMode == NOTIFY_MODE_NONE);
-                else
-                    stopForeground(newNotifyMode == NOTIFY_MODE_NONE || newNotifyMode == NOTIFY_MODE_BACKGROUND);
-            } else if (newNotifyMode == NOTIFY_MODE_NONE) {
-                mNotificationManager.cancel(notificationId);
-                mNotificationPostTime = 0;
-            }
-        }
 
-        if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-            startForeground(notificationId, buildNotification());
-        } else if (newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-            mNotificationManager.notify(notificationId, buildNotification());
-        }
+        startForeground(notificationId, buildNotification());
+        mNotificationManager.notify(notificationId, buildNotification());
 
-        mNotifyMode = newNotifyMode;
+//        final int newNotifyMode;
+//        if (isPlayingSong()) {
+//            newNotifyMode = NOTIFY_MODE_FOREGROUND;
+//        }
+////        else if (recentlyPlayed()) {
+////            newNotifyMode = NOTIFY_MODE_BACKGROUND;
+////        }
+//        else {
+//            newNotifyMode = NOTIFY_MODE_NONE;
+//        }
+//
+//        int notificationId = hashCode();
+//        if (mNotifyMode != newNotifyMode) {
+//            if (mNotifyMode == NOTIFY_MODE_FOREGROUND) {
+//                if (Utils.isLollipop())
+//                    stopForeground(newNotifyMode == NOTIFY_MODE_NONE);
+//                else
+//                    stopForeground(newNotifyMode == NOTIFY_MODE_NONE || newNotifyMode == NOTIFY_MODE_BACKGROUND);
+//            } else if (newNotifyMode == NOTIFY_MODE_NONE) {
+//                mNotificationManager.cancel(notificationId);
+//                mNotificationPostTime = 0;
+//            }
+//        }
+//
+//        if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
+//            startForeground(notificationId, buildNotification());
+//        } else if (newNotifyMode == NOTIFY_MODE_BACKGROUND) {
+//            mNotificationManager.notify(notificationId, buildNotification());
+//        }
+//
+//        mNotifyMode = newNotifyMode;
     }
 
     private void cancelNotification() {
@@ -454,6 +472,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             } else {
                playBackSongService();
             }
+            updateNotification();
         } else if (REPEAT_ACTION.equals(action)) {
             cycleRepeat();
         } else if (SHUFFLE_ACTION.equals(action)) {
