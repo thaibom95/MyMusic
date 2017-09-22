@@ -1,6 +1,7 @@
 package com.example.thaikv.musicdemo.services;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -22,6 +23,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
@@ -91,6 +93,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     private int playBackCurrentPos = 0;
     private AudioManager mAudioManager;
 
+    private MusicIntentReceiver receiverHeadphone = new MusicIntentReceiver();
+
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
@@ -109,9 +113,53 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
         @Override
         public void onAudioFocusChange(final int focusChange) {
-          //  mPlayerHandler.obtainMessage(FOCUSCHANGE, focusChange, 0).sendToTarget();
-        }
+
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    if (mediaPlayer != null)
+                        initPlayer();
+                    else if (!mediaPlayer.isPlaying()) {
+                        playSongService();
+                    }
+                    mediaPlayer.setVolume(1.0f, 1.0f);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Audio focus was lost, but it's possible to duck (i.e.: play quietly)
+                    if (mediaPlayer.isPlaying())
+                        mediaPlayer.setVolume(1.0f, 1.0f);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    // Lost audio focus, but will gain it back (shortly), so note whether
+                    // playback should resume
+                    if (mediaPlayer.isPlaying())
+                       pauseSongService();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    // Lost audio focus, probably "permanently"
+                    if (mediaPlayer.isPlaying())
+                        mediaPlayer.stop();
+                    mediaPlayer.release();
+                    mediaPlayer = null;
+                    break;
+            }
+            updateNotification();
+            }
     };
+
+    public class MusicIntentReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(
+                    android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    pauseSongService();
+                }
+            }
+        }
+    }
+
+
 
     public ArrayList<SongMusicStruct> getListSongPlay() {
         return listSongPlay;
@@ -158,8 +206,13 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         filter.addAction(REPEAT_ACTION);
         filter.addAction(SHUFFLE_ACTION);
         // Attach the broadcast listener
-        registerReceiver(mIntentReceiver, filter);
+
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager.requestAudioFocus(mAudioFocusListener, AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+        registerReceiver(mIntentReceiver, filter);
+        registerReceiver(receiverHeadphone, new IntentFilter("android.media.AUDIO_BECOMING_NOISY"));
+
 
     }
 
@@ -169,6 +222,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         super.onDestroy();
         mediaPlayer.release();
         unregisterReceiver(mIntentReceiver);
+        unregisterReceiver(receiverHeadphone);
 
     }
 
@@ -381,7 +435,9 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                         retrievePlaybackAction(TOGGLEPAUSE_ACTION))
                 .addAction(R.drawable.ic_skip_next_white_36dp,
                         "",
-                        retrievePlaybackAction(NEXT_ACTION));
+                        retrievePlaybackAction(NEXT_ACTION))
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setPriority(NotificationManager.IMPORTANCE_HIGH)
+                .setUsesChronometer(true).setAutoCancel(false);
 
         if (Utils.isJellyBeanMR1()) {
             builder.setShowWhen(false);
@@ -409,7 +465,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     private void updateNotification() {
         int notificationId = hashCode();
 
-        startForeground(notificationId, buildNotification());
+//        startForeground(notificationId, buildNotification());
         mNotificationManager.notify(notificationId, buildNotification());
 
 //        final int newNotifyMode;
