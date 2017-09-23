@@ -10,17 +10,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
-import com.example.thaikv.musicdemo.models.ItemGenres;
+import com.example.thaikv.musicdemo.models.GenresMusicStruct;
 
 import java.util.ArrayList;
 
-public class GenresAdapter extends BaseAdapter<ItemGenres, GenresAdapter.TracksViewHolder> {
+public class GenresAdapter extends BaseAdapter<GenresMusicStruct, GenresAdapter.TracksViewHolder> {
     public GenresAdapter(Context context, RecyclerView recyclerView) {
         super(context, recyclerView);
     }
 
     @Override
-    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<ItemGenres> arrayList, Context context, final OnClickItemListener onClickItemListener) {
+    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<GenresMusicStruct> arrayList, Context context, final OnClickItemListener onClickItemListener) {
         holder.rllParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -28,7 +28,7 @@ public class GenresAdapter extends BaseAdapter<ItemGenres, GenresAdapter.TracksV
             }
         });
 
-        holder.tvGenres.setText(arrayList.get(position).getNameGenres());
+        holder.tvGenres.setText(arrayList.get(position).getName());
     }
 
     @Override

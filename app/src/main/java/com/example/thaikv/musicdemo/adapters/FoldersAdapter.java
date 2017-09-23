@@ -10,17 +10,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
-import com.example.thaikv.musicdemo.models.ItemFolders;
+import com.example.thaikv.musicdemo.models.FoldersMusicStruct;
 
 import java.util.ArrayList;
 
-public class FoldersAdapter extends BaseAdapter<ItemFolders, FoldersAdapter.TracksViewHolder> {
+public class FoldersAdapter extends BaseAdapter<FoldersMusicStruct, FoldersAdapter.TracksViewHolder> {
     public FoldersAdapter(Context context, RecyclerView recyclerView) {
         super(context, recyclerView);
     }
 
     @Override
-    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<ItemFolders> arrayList, Context context, final OnClickItemListener onClickItemListener) {
+    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<FoldersMusicStruct> arrayList, Context context, final OnClickItemListener onClickItemListener) {
         holder.rllParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

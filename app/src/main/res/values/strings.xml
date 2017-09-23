@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MusicDemo</string>
+    <string name="app_name">Pi Music Player</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -13,4 +13,9 @@
         <item>PLAYLISTS</item>
         <item>FOLDERS</item>
     </string-array>
+
+    <string name="widget_standard">App standard widget</string>
+    <string name="widget_small">App small widget</string>
+    <string name="tap_to_start">Tap to start App</string>
+    <string name="widget_white">App light widget</string>
 </resources>

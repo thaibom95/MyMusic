@@ -10,7 +10,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
-import com.example.thaikv.musicdemo.models.ItemTracks;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.utils.Utils;
 

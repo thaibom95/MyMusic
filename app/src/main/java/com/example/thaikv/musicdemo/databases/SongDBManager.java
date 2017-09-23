@@ -12,13 +12,18 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.example.thaikv.musicdemo.App;
+import com.example.thaikv.musicdemo.application.App;
 import com.example.thaikv.musicdemo.BuildConfig;
+import com.example.thaikv.musicdemo.listenters.OnGetListAlbumResult;
+import com.example.thaikv.musicdemo.listenters.OnGetListArtistResult;
+import com.example.thaikv.musicdemo.listenters.OnGetListFolderResult;
+import com.example.thaikv.musicdemo.listenters.OnGetListGenreResult;
+import com.example.thaikv.musicdemo.models.AlbumMusicStruct;
 import com.example.thaikv.musicdemo.models.ArtistMusicStruct;
 import com.example.thaikv.musicdemo.models.FolderMusicStruct;
 import com.example.thaikv.musicdemo.models.GenresMusicStruct;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
-import com.example.thaikv.musicdemo.presenters.OnGetDataResult;
+import com.example.thaikv.musicdemo.listenters.OnGetListTrackResult;
 
 import java.io.FileDescriptor;
 import java.util.ArrayList;
@@ -29,7 +34,6 @@ public class SongDBManager {
 //    private Cursor cursor;
 //    private static long totalDuration = 0;
 //    private static long totalDurationNewlyAdd = 0;
-    private OnGetDataResult mOnGetDataResult;
 
     public static SongDBManager getInstance() {
         if (instance == null) {
@@ -42,12 +46,8 @@ public class SongDBManager {
         this.mContext = context;
     }
 
-    public void setOnGetDataResult(OnGetDataResult mOnGetDataResult) {
-        this.mOnGetDataResult = mOnGetDataResult;
-    }
-
     //get all songs
-    public ArrayList<SongMusicStruct> getAllSong() {
+    public ArrayList<SongMusicStruct> getAllSong(OnGetListTrackResult onGetListTrackResult) {
 //        totalDuration = 0;
         ArrayList<SongMusicStruct> listSongForArtist = new ArrayList<>();
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
@@ -97,12 +97,12 @@ public class SongDBManager {
 
         }
 
-        mOnGetDataResult.onGetDataAllSongSuccess(listSongForArtist);
+        onGetListTrackResult.onGetLisTrackSuccess(listSongForArtist);
         return listSongForArtist;
     }
 
     //get list artist
-    public ArrayList<ArtistMusicStruct> getListArtist(Context mContext) {
+    public ArrayList<ArtistMusicStruct> getListArtist(OnGetListArtistResult onGetListArtistResult) {
         ArrayList<ArtistMusicStruct> listArtistMusicStruct = new ArrayList<>();
         String[] mProjection =
                 {MediaStore.Audio.Artists._ID,
@@ -137,6 +137,7 @@ public class SongDBManager {
         }
 
         mMergeCursor.close();
+        onGetListArtistResult.onGetLisArtistSuccess(listArtistMusicStruct);
         return listArtistMusicStruct;
     }
 
@@ -190,7 +191,7 @@ public class SongDBManager {
     }
 
     //get genres
-    public ArrayList<GenresMusicStruct> getGenres(Context context) {
+    public ArrayList<GenresMusicStruct> getGenres(OnGetListGenreResult onGetListGenreResult) {
         ArrayList<GenresMusicStruct> mListGenres = new ArrayList<>();
         int index;
         long genreId;
@@ -207,7 +208,7 @@ public class SongDBManager {
                 MediaStore.Audio.Media.ALBUM};
 
         GenresMusicStruct genresMusicStruct = null;
-        genreCursor = context.getContentResolver().query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, proj1, null, null, MediaStore.Audio.Genres.NAME + " ASC");
+        genreCursor = mContext.getContentResolver().query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, proj1, null, null, MediaStore.Audio.Genres.NAME + " ASC");
         if (genreCursor != null && genreCursor.moveToFirst()) {
             do {
                 genresMusicStruct = new GenresMusicStruct();
@@ -219,7 +220,7 @@ public class SongDBManager {
                 genreId = Long.parseLong(genreCursor.getString(index));
                 genresMusicStruct.setId(genreId);
                 uri = MediaStore.Audio.Genres.Members.getContentUri("external", genreId);
-                tempCursor = context.getContentResolver().query(uri, proj2, null, null, null);
+                tempCursor = mContext.getContentResolver().query(uri, proj2, null, null, null);
                 genresMusicStruct.setNumberSongInGenres(tempCursor.getCount());
                 if (!mListGenres.contains(genresMusicStruct)) {
                     mListGenres.add(genresMusicStruct);
@@ -232,6 +233,7 @@ public class SongDBManager {
                 }
             } while (genreCursor.moveToNext());
         }
+        onGetListGenreResult.onGetLisGenreSuccess(mListGenres);
         return mListGenres;
     }
 
@@ -271,6 +273,64 @@ public class SongDBManager {
 
         }
         return mListSongsMusicStructForGenres;
+    }
+
+    //get Album
+    public ArrayList<AlbumMusicStruct> getAlbumSongs(OnGetListAlbumResult onGetListAlbumResult) {
+        ArrayList<AlbumMusicStruct> mListAlbum = new ArrayList<>();
+        String where = null;
+
+        final Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        final String _id = MediaStore.Audio.Albums._ID;
+        final String album_name = MediaStore.Audio.Albums.ALBUM;
+        final String artist = MediaStore.Audio.Albums.ARTIST;
+        final String albumart = MediaStore.Audio.Albums.ALBUM_ART;
+        final String tracks = MediaStore.Audio.Albums.NUMBER_OF_SONGS;
+
+        final String[] columns = {_id, album_name, artist, albumart, tracks};
+        Cursor cursor = this.mContext.getContentResolver().query(uri, columns, where,
+                null, MediaStore.Audio.Albums.ALBUM + " ASC");
+
+
+        // add playlsit to list
+
+        if (cursor.moveToFirst()) {
+
+            try {
+                do {
+
+                    AlbumMusicStruct albumData = new AlbumMusicStruct();
+
+                    albumData
+                            .setId(cursor.getLong(cursor.getColumnIndex(_id)));
+
+                    albumData.setName(cursor.getString(cursor
+                            .getColumnIndex(album_name)));
+
+                    albumData.setArtist(cursor.getString(cursor
+                            .getColumnIndex(artist)));
+
+                    albumData.setAlbArt(cursor.getString(cursor
+                            .getColumnIndex(albumart)));
+
+                    albumData.setNumberSong(cursor.getString(cursor
+                            .getColumnIndex(tracks)));
+
+                    albumData.setUriThumbnail(SongDBManager.getInstance().getThumbnailAlbumURI(mContext,
+                        albumData.getId()));
+
+                    mListAlbum.add(albumData);
+
+                } while (cursor.moveToNext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        cursor.close();
+
+        onGetListAlbumResult.onGetLisAlbumSuccess(mListAlbum);
+        return mListAlbum;
     }
 
     // get list song from album
@@ -323,7 +383,7 @@ public class SongDBManager {
     }
 
     // get all folder;
-    public ArrayList<FolderMusicStruct> getAllFolders(Context mContext) {
+    public ArrayList<FolderMusicStruct> getAllFolders(OnGetListFolderResult onGetListFolderResult) {
         ArrayList<FolderMusicStruct> folderMusicStructs = new ArrayList<>();
         ArrayList<String> arrayNameFolders = new ArrayList<>();
         ArrayList<String> arrayNameFoldersOrigin = new ArrayList<>();
@@ -365,21 +425,22 @@ public class SongDBManager {
                 folderMusicStructs.add(itemMusicStruct);
             }
         }
+        onGetListFolderResult.onGetLisFolderSuccess(folderMusicStructs);
         return folderMusicStructs;
     }
 
-    // get list song from folder name
-    public ArrayList<SongMusicStruct> getListSongFromFolderName(String nameFolder) {
-        ArrayList<SongMusicStruct> arrayListResult = new ArrayList<>();
-        ArrayList<SongMusicStruct> arrayListAllSong = getAllSong();
-        for (int i = 0; i < arrayListAllSong.size(); i++) {
-            String nameFolderSong = getFolder(arrayListAllSong.get(i).getPath());
-            if (nameFolderSong.equals(nameFolder)) {
-                arrayListResult.add(arrayListAllSong.get(i));
-            }
-        }
-        return arrayListResult;
-    }
+//    // get list song from folder name
+//    public ArrayList<SongMusicStruct> getListSongFromFolderName(String nameFolder) {
+//        ArrayList<SongMusicStruct> arrayListResult = new ArrayList<>();
+//        ArrayList<SongMusicStruct> arrayListAllSong = getAllSong();
+//        for (int i = 0; i < arrayListAllSong.size(); i++) {
+//            String nameFolderSong = getFolder(arrayListAllSong.get(i).getPath());
+//            if (nameFolderSong.equals(nameFolder)) {
+//                arrayListResult.add(arrayListAllSong.get(i));
+//            }
+//        }
+//        return arrayListResult;
+//    }
 
     // get name folder from path song
     public String getFolder(String path) {

@@ -10,20 +10,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
-import com.example.thaikv.musicdemo.models.ItemAlbums;
+import com.example.thaikv.musicdemo.models.AlbumMusicStruct;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AlbumsAdapter extends BaseAdapter<ItemAlbums, AlbumsAdapter.TracksViewHolder> {
+public class AlbumsAdapter extends BaseAdapter<AlbumMusicStruct, AlbumsAdapter.AlbumsViewHolder> {
     public AlbumsAdapter(Context context, RecyclerView recyclerView) {
         super(context, recyclerView);
     }
 
     @Override
-    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<ItemAlbums> arrayList, Context context, final OnClickItemListener onClickItemListener) {
+    public void bindBaseViewHolder(AlbumsViewHolder holder, final int position, ArrayList<AlbumMusicStruct> arrayList, Context context, final OnClickItemListener onClickItemListener) {
         holder.rllParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -31,11 +31,11 @@ public class AlbumsAdapter extends BaseAdapter<ItemAlbums, AlbumsAdapter.TracksV
             }
         });
 
-        holder.tvNameAlbum.setText(arrayList.get(position).getNameAlbum());
+        holder.tvNameAlbum.setText(arrayList.get(position).getName());
         holder.tvArtist.setText(arrayList.get(position).getArtist());
 
         Picasso.with(context)
-                .load(arrayList.get(position).getUrlThumbnail())
+                .load(arrayList.get(position).getUriThumbnail())
                 .placeholder(R.drawable.ic_music_default)
                 .fit()
                 .centerCrop()
@@ -43,18 +43,18 @@ public class AlbumsAdapter extends BaseAdapter<ItemAlbums, AlbumsAdapter.TracksV
     }
 
     @Override
-    public TracksViewHolder createBaseViewHolder(ViewGroup parent, LayoutInflater layoutInflater) {
-        return new TracksViewHolder(layoutInflater.inflate(R.layout.item_albums, parent, false));
+    public AlbumsViewHolder createBaseViewHolder(ViewGroup parent, LayoutInflater layoutInflater) {
+        return new AlbumsViewHolder(layoutInflater.inflate(R.layout.item_albums, parent, false));
     }
 
-    class TracksViewHolder extends RecyclerView.ViewHolder {
+    class AlbumsViewHolder extends RecyclerView.ViewHolder {
         RelativeLayout rllParent;
         CircleImageView civThumbnail;
         TextView tvNameAlbum;
         TextView tvArtist;
         ImageView ivMore;
 
-        TracksViewHolder(View itemView) {
+        AlbumsViewHolder(View itemView) {
             super(itemView);
             rllParent = itemView.findViewById(R.id.rll_parent);
             civThumbnail = itemView.findViewById(R.id.civ_thumbnail);

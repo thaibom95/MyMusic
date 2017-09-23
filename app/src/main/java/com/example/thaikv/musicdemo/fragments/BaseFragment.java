@@ -10,7 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.thaikv.musicdemo.R;
+import com.example.thaikv.musicdemo.adapters.AlbumsAdapter;
+import com.example.thaikv.musicdemo.adapters.ArtistsAdapter;
 import com.example.thaikv.musicdemo.adapters.BaseAdapter;
+import com.example.thaikv.musicdemo.adapters.FoldersAdapter;
+import com.example.thaikv.musicdemo.adapters.GenresAdapter;
+import com.example.thaikv.musicdemo.adapters.PlayListsAdapter;
 import com.example.thaikv.musicdemo.adapters.TracksAdapter;
 
 import java.util.ArrayList;
@@ -20,6 +25,7 @@ public abstract class BaseFragment<T> extends Fragment implements BaseAdapter.On
     private RecyclerView recyclerView;
     protected BaseAdapter baseAdapter;
     protected ArrayList<T> arrayList;
+
 
     private int idLayout;
     private int idRecyclerView;
@@ -51,23 +57,23 @@ public abstract class BaseFragment<T> extends Fragment implements BaseAdapter.On
                 break;
 
             case R.layout.fragment_albums:
-                baseAdapter = new TracksAdapter(getActivity(), recyclerView);
+                baseAdapter = new AlbumsAdapter(getActivity(), recyclerView);
                 break;
 
             case R.layout.fragment_artists:
-                baseAdapter = new TracksAdapter(getActivity(), recyclerView);
+                baseAdapter = new ArtistsAdapter(getActivity(), recyclerView);
                 break;
 
             case R.layout.fragment_genres:
-                baseAdapter = new TracksAdapter(getActivity(), recyclerView);
+                baseAdapter = new GenresAdapter(getActivity(), recyclerView);
                 break;
 
             case R.layout.fragment_playlists:
-                baseAdapter = new TracksAdapter(getActivity(), recyclerView);
+                baseAdapter = new PlayListsAdapter(getActivity(), recyclerView);
                 break;
 
             case R.layout.fragments_folders:
-                baseAdapter = new TracksAdapter(getActivity(), recyclerView);
+                baseAdapter = new FoldersAdapter(getActivity(), recyclerView);
                 break;
         }
 

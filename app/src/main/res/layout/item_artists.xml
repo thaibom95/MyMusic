@@ -14,7 +14,7 @@
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:padding="10dp"
+            android:padding="16dp"
             android:src="@drawable/ic_more"
             android:tint="@color/colorIcon" />
 
@@ -26,7 +26,7 @@
             android:gravity="center"
             android:text="1 Tracks"
             android:textColor="@color/colorTextSubTitle"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,7 +40,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:ellipsize="end"
-                android:gravity="center_vertical"
+                android:gravity="bottom"
+                android:layout_marginBottom="2dp"
                 android:paddingLeft="8dp"
                 android:maxLines="1"
                 android:textColor="@color/colorTextTitle"
@@ -53,7 +54,8 @@
                 android:layout_weight="1"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:gravity="center_vertical"
+                android:gravity="top"
+                android:layout_marginTop="2dp"
                 android:paddingLeft="8dp"
                 android:textColor="@color/colorTextSubTitle"
                 android:textSize="14sp" />
