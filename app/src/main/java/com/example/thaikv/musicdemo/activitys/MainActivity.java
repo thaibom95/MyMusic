@@ -1,5 +1,9 @@
 package com.example.thaikv.musicdemo.activitys;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,11 +17,21 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
 import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.adapters.ViewPagerAdapter;
+import com.example.thaikv.musicdemo.controllers.MusicPlayer;
+import com.example.thaikv.musicdemo.models.SongMusicStruct;
+import com.example.thaikv.musicdemo.services.PlayTrackService;
+import com.example.thaikv.musicdemo.utils.Utils;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
     private Toolbar toolbar;
@@ -26,12 +40,27 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private NavigationView navigationView;
     private SmartTabLayout smartTabLayout;
     private ViewPager viewPager;
+    Toolbar toolbarPlayer;
+    private CircleImageView civ_thumbnail;
+    private TextView tv_name_song;
+    private ImageView iv_play_pause;
+    private TextView tv_artist;
+    private ProgressBar progressBarPlay;
+    private BroadcastReceiver receivSong = new ReceiveStartSong();
+    private SongMusicStruct currentSong;
+    int overflowcounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receivSong);
     }
 
     private void initViews() {
@@ -41,11 +70,75 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         initNavigation();
         initViewPager();
         initTabs();
+        IntentFilter filter = new IntentFilter(PlayTrackService.START_PLAY_NEW_SONG);
+        registerReceiver(receivSong, filter);
     }
 
     private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbarPlayer = (Toolbar) findViewById(R.id.toolbarPlayer);
+        toolbarPlayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, PlayerActivity.class));
+            }
+        });
+
+        civ_thumbnail = (CircleImageView) findViewById(R.id.civ_thumbnail);
+        iv_play_pause = (ImageView) findViewById(R.id.iv_play_pause);
+        tv_name_song = (TextView) findViewById(R.id.tv_name_song);
+        tv_artist = (TextView) findViewById(R.id.tv_artist);
+        progressBarPlay = (ProgressBar) findViewById(R.id.pbg_browser__webview);
+        getCurrentSongAndSetup();
+        iv_play_pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentSong == null)
+                    return;
+                if(MusicPlayer.isSongPlaying()){
+                    iv_play_pause.setImageResource(R.drawable.ic_play_white_36dp);
+                }else {
+                    iv_play_pause.setImageResource(R.drawable.ic_pause_white_36dp);
+                }
+                MusicPlayer.playOrPause();
+
+            }
+        });
+
+
+    }
+
+    public void getCurrentSongAndSetup() {
+        currentSong = MusicPlayer.getCurrentSongPlay();
+        if (currentSong == null) {
+            tv_name_song.setText("");
+            tv_artist.setText("");
+            progressBarPlay.setMax(100);
+            progressBarPlay.setProgress(0);
+            toolbarPlayer.setEnabled(false);
+            iv_play_pause.setEnabled(false);
+
+
+        } else {
+            Picasso.with(this).load(Utils.getAlbumArtUri(currentSong.getIdAlbum())).error(R.drawable.bgk_player_256).into(civ_thumbnail);
+            tv_name_song.setText(currentSong.getName());
+            tv_artist.setText(currentSong.getArtist());
+            toolbarPlayer.setEnabled(true);
+            iv_play_pause.setEnabled(true);
+            long time = currentSong.getDuration();
+            progressBarPlay.setMax((int) time);
+            progressBarPlay.setProgress(0);
+            if (mUpdateProgress != null) {
+                progressBarPlay.removeCallbacks(mUpdateProgress);
+            }
+            progressBarPlay.postDelayed(mUpdateProgress, 10);
+            if(MusicPlayer.isSongPlaying()){
+                iv_play_pause.setImageResource(R.drawable.ic_play_white_36dp);
+            }else {
+                iv_play_pause.setImageResource(R.drawable.ic_pause_white_36dp);
+            }
+        }
     }
 
     private void initFloatingButton() {
@@ -63,7 +156,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
     }
 
@@ -139,4 +232,36 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onPageScrollStateChanged(int state) {
 
     }
+
+    private class ReceiveStartSong extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(PlayTrackService.START_PLAY_NEW_SONG)) {
+                getCurrentSongAndSetup();
+
+            }
+        }
+    }
+
+    public Runnable mUpdateProgress = new Runnable() {
+
+        @Override
+        public void run() {
+
+            long position = MusicPlayer.getCurrentPositionPlay();
+            if (progressBarPlay != null) {
+                progressBarPlay.setProgress((int) position);
+            }
+            overflowcounter--;
+            if (MusicPlayer.isSongPlaying()) {
+                int delay = (int) (1500 - (position % 1000));
+                if (overflowcounter < 0) {
+                    overflowcounter++;
+                    progressBarPlay.postDelayed(mUpdateProgress, delay);
+                }
+            }
+
+        }
+    };
 }

@@ -65,7 +65,13 @@ public class MusicPlayer {
         }
     }
 
+    public static SongMusicStruct getCurrentSongPlay(){
+        if (mService != null) {
+            return mService.getCurrenSongPlay();
+        }
+        return null;
 
+    }
     public static void next() {
         if (mService != null) {
             mService.nextSongService();
@@ -98,6 +104,26 @@ public class MusicPlayer {
             mService.setListSongType(type);
         }
     }
+    public static boolean isSongPlaying(){
+        if(mService != null){
+            return mService.isPlayingSong();
+        }
+        return false;
+    }
+
+    public static long getCurrentPositionPlay(){
+        if(mService != null){
+           return mService.getCurrentTimePlay();
+        }
+        return 0;
+    }
+    public static void seekSongPlayto(int s){
+        if(mService != null){
+          mService.seekSongPlayTo(s);
+        }
+
+    }
+
 
     public static void previous(final Context context, final boolean force) {
         final Intent previous = new Intent(context, PlayTrackService.class);
@@ -115,7 +141,7 @@ public class MusicPlayer {
             if (mService.isPlayingSong()) {
                 mService.pauseSongService();
             } else {
-                mService.playSongService();
+                mService.playBackSongService();
             }
         }
 

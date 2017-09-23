@@ -18,4 +18,6 @@
     <color name="colorBtnActived">#be4d56</color>
     <color name="colorBtNormal">#247cf7</color>
     <color name="colorNavBar">#cc272c33</color>
+
+    <color name="colorTransparentDark">#44000000</color>
 </resources>

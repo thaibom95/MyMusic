@@ -34,7 +34,7 @@ public class TracksFragment extends BaseFragment<SongMusicStruct> implements Tra
     @Override
     protected void onClickItemListenerBase(int position) {
 
-        startActivity(new Intent(getActivity(), PlayerActivity.class));
+
 
         if(MusicPlayer.getTyleListSongs() != PlayTrackService.PLAYLIST){
             if(MusicPlayer.setPlaylist(arrayList)){
@@ -44,6 +44,7 @@ public class TracksFragment extends BaseFragment<SongMusicStruct> implements Tra
         }else {
             MusicPlayer.playWithPos(position);
         }
+        startActivity(new Intent(getActivity(), PlayerActivity.class));
     }
 
     @Override

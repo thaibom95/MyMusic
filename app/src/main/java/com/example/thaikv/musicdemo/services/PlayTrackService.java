@@ -34,6 +34,7 @@ import com.example.thaikv.musicdemo.utils.Utils;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
 import java.util.ArrayList;
 
 public class PlayTrackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
@@ -49,9 +50,10 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     public static final String NEXT_ACTION = PREFIX + "next";
     public static final String TOGGLEPAUSE_ACTION = PREFIX + "togglepause";
 
-    public static final String REPEAT_ACTION = PREFIX+"repeat";
-    public static final String SHUFFLE_ACTION = PREFIX+"shuffle";
+    public static final String REPEAT_ACTION = PREFIX + "repeat";
+    public static final String SHUFFLE_ACTION = PREFIX + "shuffle";
 
+    public static final String START_PLAY_NEW_SONG = PREFIX + "start_play_new_song";
 
 
     //repeat mode
@@ -106,7 +108,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     };
 
 
-
     public PlayTrackService() {
     }
 
@@ -134,7 +135,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                     // Lost audio focus, but will gain it back (shortly), so note whether
                     // playback should resume
                     if (mediaPlayer.isPlaying())
-                       pauseSongService();
+                        pauseSongService();
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS:
                     // Lost audio focus, probably "permanently"
@@ -145,10 +146,10 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                     break;
             }
             updateNotification();
-            }
+        }
     };
 
-    public class MusicIntentReceiver extends BroadcastReceiver{
+    public class MusicIntentReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -160,7 +161,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             }
         }
     }
-
 
 
     public ArrayList<SongMusicStruct> getListSongPlay() {
@@ -199,7 +199,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         initPlayer();
 
         final IntentFilter filter = new IntentFilter();
-       // filter.addAction(SERVICECMD);
+        // filter.addAction(SERVICECMD);
         filter.addAction(TOGGLEPAUSE_ACTION);
 //        filter.addAction(PAUSE_ACTION);
 //        filter.addAction(STOP_ACTION);
@@ -243,6 +243,22 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         return super.onUnbind(intent);
     }
 
+
+    public SongMusicStruct getCurrenSongPlay() {
+        if(listSongPlay == null || listSongPlay.size() == 0)
+            return  null;
+        if (songPlay == null) {
+            songPlay = listSongPlay.get(indexSong);
+        }
+        return songPlay;
+    }
+
+    public void  seekSongPlayTo(int s){
+        if(mediaPlayer != null){
+            mediaPlayer.seekTo(s);
+        }
+    }
+
     public void playSongService() {
 
         playBackCurrentPos = 0;
@@ -252,7 +268,12 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             return;
         }
+
+        Intent in = new Intent(START_PLAY_NEW_SONG);
+        sendBroadcast(in);
+
         mediaPlayer.reset();
+
 
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -281,8 +302,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         mediaPlayer.prepareAsync();
     }
 
-    public void playBackSongService(){
-        if(mediaPlayer != null &&  playBackCurrentPos < mediaPlayer.getDuration()){
+    public void playBackSongService() {
+        if (mediaPlayer != null && playBackCurrentPos < mediaPlayer.getDuration()) {
             mediaPlayer.seekTo(playBackCurrentPos);
             mediaPlayer.start();
         }
@@ -305,23 +326,30 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void nextSongService() {
-        if(indexSong < listSongPlay.size()-1){
+        if (indexSong < listSongPlay.size() - 1) {
             indexSong++;
-        }
-        else
+        } else
             indexSong = 0;
         songPlay = listSongPlay.get(indexSong);
         playSongService();
 
     }
+
     public void preveSongService() {
-        if(indexSong > 0){
+        if (indexSong > 0) {
             indexSong--;
-        }
-        else
-            indexSong = listSongPlay.size()-1;
+        } else
+            indexSong = listSongPlay.size() - 1;
         songPlay = listSongPlay.get(indexSong);
         playSongService();
+    }
+
+    public long getCurrentTimePlay() {
+        if (mediaPlayer == null) {
+            initPlayer();
+            return 0;
+        } else
+            return mediaPlayer.getCurrentPosition();
     }
 
     public int getRepeatMode() {
@@ -374,6 +402,10 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     private Notification buildNotification() {
+        if(listSongPlay == null || listSongPlay.size() == 0)
+            return null;
+        if(songPlay == null)
+            songPlay = listSongPlay.get(indexSong);
         final String albumName = songPlay.getAlbum();
         final String artistName = songPlay.getArtist();
         final boolean isPlaying = isPlayingSong();
@@ -407,10 +439,9 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             });
 
             if (artwork[0] == null) {
-                artwork[0] = Utils.drawableToBitmap(getResources().getDrawable(R.drawable.ic_empty_music2));
+                artwork[0] = Utils.drawableToBitmap(getResources().getDrawable(R.drawable.bgk_player_256));
             }
         }
-
 
 
         if (artwork[0] == null) {
@@ -514,7 +545,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         final String action = intent.getAction();
 
 
-        Log.d(TAG, "===== handleCommandIntent: action = " + action );
+        Log.d(TAG, "===== handleCommandIntent: action = " + action);
 
 
         if (NEXT_ACTION.equals(action)) {
@@ -527,7 +558,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                 pauseSongService();
 
             } else {
-               playBackSongService();
+                playBackSongService();
             }
             updateNotification();
         } else if (REPEAT_ACTION.equals(action)) {
