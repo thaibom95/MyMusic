@@ -3,6 +3,7 @@ package com.example.thaikv.musicdemo.presenters.impls;
 import android.content.Context;
 
 import com.example.thaikv.musicdemo.databases.SongDBManager;
+import com.example.thaikv.musicdemo.listenters.OnGetListTrackResult;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.presenters.OnGetDataResult;
 import com.example.thaikv.musicdemo.presenters.TracksFragmentPresenter;
@@ -10,16 +11,12 @@ import com.example.thaikv.musicdemo.views.TracksFragmentView;
 
 import java.util.ArrayList;
 
-public class TracksFragmentPresenterImpl implements TracksFragmentPresenter, OnGetDataResult {
+public class TracksFragmentPresenterImpl implements TracksFragmentPresenter, OnGetListTrackResult {
     private TracksFragmentView mTracksFragmentView;
-
-    public TracksFragmentPresenterImpl() {
-        SongDBManager.getInstance().setOnGetDataResult(this);
-    }
 
     @Override
     public void getListTrack() {
-        SongDBManager.getInstance().getAllSong();
+        SongDBManager.getInstance().getAllSong(this);
     }
 
     @Override
@@ -28,12 +25,12 @@ public class TracksFragmentPresenterImpl implements TracksFragmentPresenter, OnG
     }
 
     @Override
-    public void onGetDataAllSongSuccess(ArrayList<SongMusicStruct> arrayList) {
-        mTracksFragmentView.getListTrackSuccess(arrayList);
+    public void onGetLisTrackSuccess(ArrayList<SongMusicStruct> songMusicStructs) {
+        mTracksFragmentView.getListTrackSuccess(songMusicStructs);
     }
 
     @Override
-    public void onGetDataAllSongFail() {
+    public void onGetLisTrackFail() {
         mTracksFragmentView.getListTrackFail();
     }
 }

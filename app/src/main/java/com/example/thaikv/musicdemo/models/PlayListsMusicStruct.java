@@ -1,9 +1,9 @@
 package com.example.thaikv.musicdemo.models;
 
-public class ItemPlayLists {
+public class PlayListsMusicStruct {
     private String namePlayList;
 
-    public ItemPlayLists(String namePlayList) {
+    public PlayListsMusicStruct(String namePlayList) {
         this.namePlayList = namePlayList;
     }
 

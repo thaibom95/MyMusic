@@ -2,11 +2,10 @@ package com.example.thaikv.musicdemo.fragments;
 
 import android.annotation.SuppressLint;
 
-import com.example.thaikv.musicdemo.models.ItemFolders;
-import com.example.thaikv.musicdemo.models.ItemTracks;
+import com.example.thaikv.musicdemo.models.FoldersMusicStruct;
 
 @SuppressLint("ValidFragment")
-public class FoldersFragment extends BaseFragment<ItemFolders> {
+public class FoldersFragment extends BaseFragment<FoldersMusicStruct> {
 
     public FoldersFragment(int idLayout, int idRecyclerView, int idProgressBar) {
         super(idLayout, idRecyclerView, idProgressBar);

@@ -22,28 +22,25 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.utils.NavigationUtils;
 import com.example.thaikv.musicdemo.utils.Utils;
-import com.nostra13.universalimageloader.core.ImageLoader;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class PlayTrackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
 
+
     private static final String TAG = "PlayTrackService";
+
     public static final String PREFIX = "com.example.thaikv.musicdemo.";
 
     public static final String PREVIOUS_ACTION = PREFIX + "previous";
@@ -51,8 +48,10 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
     public static final String NEXT_ACTION = PREFIX + "next";
     public static final String TOGGLEPAUSE_ACTION = PREFIX + "togglepause";
+
     public static final String REPEAT_ACTION = PREFIX+"repeat";
     public static final String SHUFFLE_ACTION = PREFIX+"shuffle";
+
 
 
     //repeat mode
@@ -106,8 +105,11 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         }
     };
 
+
+
     public PlayTrackService() {
     }
+
 
     private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
 
@@ -195,6 +197,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         mNotificationManager = NotificationManagerCompat.from(this);
         indexSong = 0;
         initPlayer();
+
         final IntentFilter filter = new IntentFilter();
        // filter.addAction(SERVICECMD);
         filter.addAction(TOGGLEPAUSE_ACTION);
@@ -213,7 +216,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         registerReceiver(mIntentReceiver, filter);
         registerReceiver(receiverHeadphone, new IntentFilter("android.media.AUDIO_BECOMING_NOISY"));
 
-
     }
 
 
@@ -221,8 +223,10 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     public void onDestroy() {
         super.onDestroy();
         mediaPlayer.release();
+
         unregisterReceiver(mIntentReceiver);
         unregisterReceiver(receiverHeadphone);
+        cancelNotification();
 
     }
 
@@ -240,6 +244,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void playSongService() {
+
         playBackCurrentPos = 0;
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -247,7 +252,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             return;
         }
-
         mediaPlayer.reset();
 
         Uri trackUri = ContentUris.withAppendedId(
@@ -276,7 +280,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         }
         mediaPlayer.prepareAsync();
     }
-
 
     public void playBackSongService(){
         if(mediaPlayer != null &&  playBackCurrentPos < mediaPlayer.getDuration()){
@@ -319,7 +322,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             indexSong = listSongPlay.size()-1;
         songPlay = listSongPlay.get(indexSong);
         playSongService();
-
     }
 
     public int getRepeatMode() {
@@ -349,7 +351,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         nextSongService();
-
     }
 
     @Override
@@ -372,9 +373,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         }
     }
 
-
-
-
     private Notification buildNotification() {
         final String albumName = songPlay.getAlbum();
         final String artistName = songPlay.getArtist();
@@ -390,7 +388,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         final Bitmap[] artwork = {null};
         long albumId = songPlay.getIdAlbum();
         if (albumId != -1) {
-
             Uri uri_image = Utils.getAlbumArtUri(albumId);
             Picasso.with(getApplicationContext()).load(uri_image).into(new Target() {
                 @Override
@@ -409,13 +406,16 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                 }
             });
 
-           // artwork = ImageLoader.getInstance().loadImageSync( Utils.getAlbumArtUri(albumId).toString());
             if (artwork[0] == null) {
                 artwork[0] = Utils.drawableToBitmap(getResources().getDrawable(R.drawable.ic_empty_music2));
             }
         }
 
 
+
+        if (artwork[0] == null) {
+            Utils.drawableToBitmap(getResources().getDrawable(R.drawable.ic_empty_music2));
+        }
 
         if (mNotificationPostTime == 0) {
             mNotificationPostTime = System.currentTimeMillis();
@@ -499,6 +499,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 //        }
 //
 //        mNotifyMode = newNotifyMode;
+
     }
 
     private void cancelNotification() {
@@ -557,5 +558,4 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             setShuffleMode(SHUFFLE_NONE);
         }
     }
-
 }

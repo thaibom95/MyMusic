@@ -1,10 +1,10 @@
 package com.example.thaikv.musicdemo.models;
 
-public class ItemFolders {
+public class FoldersMusicStruct {
     private String nameFolder;
     private boolean isFile;
 
-    public ItemFolders(String nameFolder, boolean isFile) {
+    public FoldersMusicStruct(String nameFolder, boolean isFile) {
         this.nameFolder = nameFolder;
         this.isFile = isFile;
     }

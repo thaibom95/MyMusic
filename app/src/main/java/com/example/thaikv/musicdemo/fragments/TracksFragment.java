@@ -2,6 +2,9 @@ package com.example.thaikv.musicdemo.fragments;
 
 import android.annotation.SuppressLint;
 
+import android.content.Intent;
+
+import com.example.thaikv.musicdemo.activitys.PlayerActivity;
 import com.example.thaikv.musicdemo.controllers.MusicPlayer;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.presenters.TracksFragmentPresenter;
@@ -30,6 +33,9 @@ public class TracksFragment extends BaseFragment<SongMusicStruct> implements Tra
 
     @Override
     protected void onClickItemListenerBase(int position) {
+
+        startActivity(new Intent(getActivity(), PlayerActivity.class));
+
         if(MusicPlayer.getTyleListSongs() != PlayTrackService.PLAYLIST){
             if(MusicPlayer.setPlaylist(arrayList)){
                 MusicPlayer.setTyleListSongs(PlayTrackService.PLAYLIST);
@@ -38,9 +44,6 @@ public class TracksFragment extends BaseFragment<SongMusicStruct> implements Tra
         }else {
             MusicPlayer.playWithPos(position);
         }
-
-
-
     }
 
     @Override

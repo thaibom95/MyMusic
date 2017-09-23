@@ -10,17 +10,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
-import com.example.thaikv.musicdemo.models.ItemArtists;
+import com.example.thaikv.musicdemo.models.ArtistMusicStruct;
 
 import java.util.ArrayList;
 
-public class ArtistsAdapter extends BaseAdapter<ItemArtists, ArtistsAdapter.TracksViewHolder> {
+public class ArtistsAdapter extends BaseAdapter<ArtistMusicStruct, ArtistsAdapter.TracksViewHolder> {
     public ArtistsAdapter(Context context, RecyclerView recyclerView) {
         super(context, recyclerView);
     }
 
     @Override
-    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<ItemArtists> arrayList, Context context, final OnClickItemListener onClickItemListener) {
+    public void bindBaseViewHolder(TracksViewHolder holder, final int position, ArrayList<ArtistMusicStruct> arrayList, Context context, final OnClickItemListener onClickItemListener) {
         holder.rllParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -28,9 +28,9 @@ public class ArtistsAdapter extends BaseAdapter<ItemArtists, ArtistsAdapter.Trac
             }
         });
 
-        holder.tvNameArtist.setText(arrayList.get(position).getArtist());
-        holder.tvCountAlbums.setText(arrayList.get(position).getCountAlbum() + " Albums");
-        holder.tvCountTracks.setText(arrayList.get(position).getCountTrack() + " Tracks");
+        holder.tvNameArtist.setText(arrayList.get(position).getName());
+        holder.tvCountAlbums.setText(arrayList.get(position).getNumberAlbumOfArtist() + " Albums");
+        holder.tvCountTracks.setText(arrayList.get(position).getNumberSongOfArtist() + " Tracks");
     }
 
     @Override

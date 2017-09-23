@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#626566</color>
-    <color name="colorPrimaryDark">#607D8B</color>
-    <color name="colorAccent">#de3232</color>
-    <color name="colorBgkHeader">#403a3a</color>
+    <color name="colorPrimary">#272c33</color>
+    <color name="colorPrimaryDark">#273238</color>
+    <color name="colorAccent">#be4d56</color>
+    <color name="colorBgkHeader">#272c33</color>
     <color name="colorTextTitle">#ffffff</color>
     <color name="colorTextSubTitle">#b1f1f1f1</color>
     <color name="colorTabLayoutSelected">#70f76464</color>
     <color name="colorCreateFolder">#de3232</color>
-    <color name="colorBgkPrimary">#ab1b1b</color>
-    <color name="colorBgkDark">#401313</color>
+    <color name="colorBgkPrimary">#7d1d2a</color>
+    <color name="colorBgkDark">#1c0709</color>
     <color name="colorTransparent">#00ffffff</color>
     <color name="colorIcon">#848484</color>
     <color name="black_translucent">#66000000</color>
     <color name="colorSelectableItemWhite">#77ffffff</color>
+
+    <color name="colorBtnActived">#be4d56</color>
+    <color name="colorBtNormal">#247cf7</color>
+    <color name="colorNavBar">#cc272c33</color>
 </resources>

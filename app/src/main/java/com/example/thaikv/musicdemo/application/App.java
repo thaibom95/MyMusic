@@ -1,4 +1,4 @@
-package com.example.thaikv.musicdemo;
+package com.example.thaikv.musicdemo.application;
 
 import android.app.Application;
 
