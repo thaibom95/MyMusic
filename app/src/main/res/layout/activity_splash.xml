@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bgk_splash"
+    android:background="@drawable/bgk_splash_image_new"
     android:orientation="vertical">
 
     <LinearLayout
@@ -16,7 +16,7 @@
             android:layout_width="112dp"
             android:layout_height="112dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_app_128" />
+            android:src="@drawable/ic_app_128_new" />
 
         <TextView
             android:id="@+id/tv_name_app"

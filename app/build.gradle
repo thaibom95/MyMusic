@@ -33,6 +33,7 @@ dependencies {
     compile 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:1.2.32@aar'
     compile 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     compile 'com.android.support:palette-v7:26.+'
+    compile 'jp.wasabeef:blurry:2.1.1'
     testCompile 'junit:junit:4.12'
     compile project(':recyclerview-fastscroll')
 }

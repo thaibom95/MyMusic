@@ -1,14 +1,21 @@
 package com.example.thaikv.musicdemo.activitys;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
 
+import jp.wasabeef.blurry.Blurry;
+
 public class PlayerActivity extends BaseActivity implements View.OnClickListener {
+    private LinearLayout lnlParent;
     private ImageView ivBack;
     private ImageView ivShuffle;
     private ImageView ivPrevious;
@@ -32,6 +39,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initViews() {
+        lnlParent = (LinearLayout) findViewById(R.id.lnl_parent_music_player);
         ivBack = (ImageView) findViewById(R.id.iv_back);
         ivShuffle = (ImageView) findViewById(R.id.iv_shuffle);
         ivPrevious = (ImageView) findViewById(R.id.iv_previous);
@@ -46,6 +54,15 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         tvTotalTime = (TextView) findViewById(R.id.tv_total_time);
 
         sbProgress = (SeekBar) findViewById(R.id.skb_progress);
+
+//        Blurry.with(this)
+//                .radius(10)
+//                .sampling(10)
+//                .color(Color.argb(26, 255, 255, 0))
+//                .async()
+//                .animate(1)
+//                .onto(lnlParent);
+
     }
 
     private void initEvents() {

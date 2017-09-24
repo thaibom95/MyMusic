@@ -26,12 +26,12 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         titleTabLayouts = context.getResources().getStringArray(R.array.title_tab_layout);
 
         fragmentArrayList = new ArrayList<>();
-        fragmentArrayList.add(new TracksFragment(R.layout.fragment_tracks, R.id.rcv_tracks, R.id.pgb_loading_tracks));
-        fragmentArrayList.add(new AlbumsFragment(R.layout.fragment_albums, R.id.rcv_albums, R.id.pgb_loading_albums));
-        fragmentArrayList.add(new ArtistsFragment(R.layout.fragment_artists, R.id.rcv_artists, R.id.pgb_loading_artists));
-        fragmentArrayList.add(new GenresFragment(R.layout.fragment_genres, R.id.rcv_genres, R.id.pgb_loading_genres));
-        fragmentArrayList.add(new PlaylistsFragment(R.layout.fragment_playlists, R.id.rcv_playlists, R.id.pgb_loading_playlists));
-        fragmentArrayList.add(new FoldersFragment(R.layout.fragments_folders, R.id.rcv_folders, R.id.pgb_loading_folders));
+        fragmentArrayList.add(new TracksFragment(R.layout.fragment_tracks, R.id.fs_rcv_tracks, R.id.pgb_loading_tracks));
+        fragmentArrayList.add(new AlbumsFragment(R.layout.fragment_albums, R.id.fs_rcv_albums, R.id.pgb_loading_albums));
+        fragmentArrayList.add(new ArtistsFragment(R.layout.fragment_artists, R.id.fs_rcv_artists, R.id.pgb_loading_artists));
+        fragmentArrayList.add(new GenresFragment(R.layout.fragment_genres, R.id.fs_rcv_genres, R.id.pgb_loading_genres));
+        fragmentArrayList.add(new PlaylistsFragment(R.layout.fragment_playlists, R.id.fs_rcv_playlists, R.id.pgb_loading_playlists));
+        fragmentArrayList.add(new FoldersFragment(R.layout.fragments_folders, R.id.fs_rcv_folders, R.id.pgb_loading_folders));
     }
 
     @Override

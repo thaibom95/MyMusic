@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lnl_parent_music_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBgkDark"
+    android:background="@color/colorNavBar"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -77,7 +78,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginRight="32dp"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/bgk_player_256" />
+                android:background="@drawable/music_default_big" />
         </RelativeLayout>
 
         <LinearLayout
@@ -191,7 +192,7 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingLeft="8dp"
-                    android:text="3:45"
+                    android:text="1:45"
                     android:textColor="@color/colorTextTitle"
                     android:textSize="14sp" />
 
@@ -213,7 +214,7 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingRight="8dp"
-                    android:text="01:03:45"
+                    android:text="3:55"
                     android:textColor="@color/colorTextTitle"
                     android:textSize="14sp" />
 

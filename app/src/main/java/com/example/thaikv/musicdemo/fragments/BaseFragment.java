@@ -17,12 +17,13 @@ import com.example.thaikv.musicdemo.adapters.FoldersAdapter;
 import com.example.thaikv.musicdemo.adapters.GenresAdapter;
 import com.example.thaikv.musicdemo.adapters.PlayListsAdapter;
 import com.example.thaikv.musicdemo.adapters.TracksAdapter;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 public abstract class BaseFragment<T> extends Fragment implements BaseAdapter.OnClickItemListener {
     private View rootView;
-    private RecyclerView recyclerView;
+    private FastScrollRecyclerView fastScrollRecyclerView;
     protected BaseAdapter baseAdapter;
     protected ArrayList<T> arrayList;
 
@@ -48,36 +49,36 @@ public abstract class BaseFragment<T> extends Fragment implements BaseAdapter.On
     protected void initViews(LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(idLayout, container, false);
 
-        recyclerView = (RecyclerView) rootView.findViewById(idRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        fastScrollRecyclerView = (FastScrollRecyclerView) rootView.findViewById(idRecyclerView);
+        fastScrollRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        fastScrollRecyclerView.setItemAnimator(new DefaultItemAnimator());
         switch (idLayout) {
             case R.layout.fragment_tracks:
-                baseAdapter = new TracksAdapter(getActivity(), recyclerView);
+                baseAdapter = new TracksAdapter(getActivity(), fastScrollRecyclerView);
                 break;
 
             case R.layout.fragment_albums:
-                baseAdapter = new AlbumsAdapter(getActivity(), recyclerView);
+                baseAdapter = new AlbumsAdapter(getActivity(), fastScrollRecyclerView);
                 break;
 
             case R.layout.fragment_artists:
-                baseAdapter = new ArtistsAdapter(getActivity(), recyclerView);
+                baseAdapter = new ArtistsAdapter(getActivity(), fastScrollRecyclerView);
                 break;
 
             case R.layout.fragment_genres:
-                baseAdapter = new GenresAdapter(getActivity(), recyclerView);
+                baseAdapter = new GenresAdapter(getActivity(), fastScrollRecyclerView);
                 break;
 
             case R.layout.fragment_playlists:
-                baseAdapter = new PlayListsAdapter(getActivity(), recyclerView);
+                baseAdapter = new PlayListsAdapter(getActivity(), fastScrollRecyclerView);
                 break;
 
             case R.layout.fragments_folders:
-                baseAdapter = new FoldersAdapter(getActivity(), recyclerView);
+                baseAdapter = new FoldersAdapter(getActivity(), fastScrollRecyclerView);
                 break;
         }
 
-        recyclerView.setAdapter(baseAdapter);
+        fastScrollRecyclerView.setAdapter(baseAdapter);
     }
 
     protected void initEvents() {

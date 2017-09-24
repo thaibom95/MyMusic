@@ -30,47 +30,50 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <include layout="@layout/layout_player_mini" />
+            <include
+                android:visibility="invisible"
+                android:id="@+id/lnl_parent_player_mini"
+                layout="@layout/layout_player_mini" />
         </android.support.v7.widget.Toolbar>
 
         <!--<android.support.design.widget.TabLayout-->
-            <!--android:id="@+id/tabLayout"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="48dp"-->
-            <!--android:background="@color/colorBgkHeader"-->
-            <!--app:tabGravity="center"-->
-            <!--app:tabMode="scrollable"/>-->
+        <!--android:id="@+id/tabLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="48dp"-->
+        <!--android:background="@color/colorBgkHeader"-->
+        <!--app:tabGravity="center"-->
+        <!--app:tabMode="scrollable"/>-->
 
         <com.ogaclejapan.smarttablayout.SmartTabLayout
             android:id="@+id/tabLayout"
-            android:background="@color/colorBgkHeader"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            app:stl_indicatorAlwaysInCenter="false"
-            app:stl_indicatorWithoutPadding="false"
-            app:stl_indicatorInFront="false"
-            app:stl_indicatorInterpolation="smart"
-            app:stl_indicatorGravity="center"
-            app:stl_indicatorColor="@color/colorTabLayoutSelected"
-            app:stl_indicatorThickness="30dp"
-            app:stl_indicatorWidth="auto"
-            app:stl_indicatorCornerRadius="15dp"
-            app:stl_overlineColor="#1944e1"
-            app:stl_overlineThickness="0dp"
-            app:stl_underlineColor="#4D000000"
-            app:stl_underlineThickness="1dp"
-            app:stl_dividerColor="#f9e000"
-            app:stl_dividerThickness="0dp"
+            android:background="@color/colorBgkHeader"
+            app:stl_clickable="true"
             app:stl_defaultTabBackground="?attr/selectableItemBackground"
             app:stl_defaultTabTextAllCaps="true"
             app:stl_defaultTabTextColor="@color/colorTextTitle"
-            app:stl_defaultTabTextSize="12sp"
             app:stl_defaultTabTextHorizontalPadding="16dp"
             app:stl_defaultTabTextMinWidth="0dp"
+            app:stl_defaultTabTextSize="12sp"
             app:stl_distributeEvenly="false"
-            app:stl_clickable="true"
+            app:stl_dividerColor="#f9e000"
+            app:stl_dividerThickness="0dp"
+            app:stl_drawDecorationAfterTab="false"
+            app:stl_indicatorAlwaysInCenter="false"
+            app:stl_indicatorColor="@color/colorTabLayoutSelected"
+            app:stl_indicatorCornerRadius="15dp"
+            app:stl_indicatorGravity="center"
+            app:stl_indicatorInFront="false"
+            app:stl_indicatorInterpolation="smart"
+            app:stl_indicatorThickness="30dp"
+            app:stl_indicatorWidth="auto"
+            app:stl_indicatorWithoutPadding="false"
+            app:stl_overlineColor="#1944e1"
+            app:stl_overlineThickness="0dp"
             app:stl_titleOffset="24dp"
-            app:stl_drawDecorationAfterTab="false" />
+            app:stl_underlineColor="#4D000000"
+            app:stl_underlineThickness="1dp" />
 
     </android.support.design.widget.AppBarLayout>
 

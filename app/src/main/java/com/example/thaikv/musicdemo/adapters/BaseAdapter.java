@@ -1,13 +1,17 @@
 package com.example.thaikv.musicdemo.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+
 import java.util.ArrayList;
 
-public abstract class BaseAdapter<T, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class BaseAdapter<T, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements FastScrollRecyclerView.SectionedAdapter {
     private static final String TAG = "BaseAdapter";
 
     private final int VIEW_ITEM = 1;
@@ -18,7 +22,7 @@ public abstract class BaseAdapter<T, V extends RecyclerView.ViewHolder> extends 
     private OnClickItemListener mOnClickItemListener;
 
 
-    public BaseAdapter(final Context context, RecyclerView recyclerView) {
+    public BaseAdapter(final Context context, FastScrollRecyclerView fastScrollRecyclerView) {
         this.mContext = context;
         this.layoutInflater = LayoutInflater.from(context);
         arrayList = new ArrayList<>();
