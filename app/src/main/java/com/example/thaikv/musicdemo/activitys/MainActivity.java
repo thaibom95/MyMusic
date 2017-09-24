@@ -70,7 +70,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     ServiceConnection serviceConnect = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-
+            getCurrentSongAndSetup();
         }
 
 
@@ -79,26 +79,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if(MusicPlayer.mService == null){
-            MusicPlayer.ServiceToken mToken = MusicPlayer.bindToService(this,serviceConnect);
-        }
-        initViews();
+        checkPermissions();
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receivSong);
-        checkPermissions();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void checkPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -113,8 +108,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             initViews();
         }
     }
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+
     private void initViews() {
+        if (MusicPlayer.mService == null) {
+            MusicPlayer.ServiceToken mToken = MusicPlayer.bindToService(this, serviceConnect);
+        }
         initToolbar();
         initFloatingButton();
         initDrawerLayout();
@@ -181,7 +179,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             iv_play_pause.setEnabled(true);
             long time = currentSong.getDuration();
             progressBarPlay.setMax((int) time);
-            progressBarPlay.setProgress((int)(MusicPlayer.getCurrentPositionPlay()));
+            progressBarPlay.setProgress((int) (MusicPlayer.getCurrentPositionPlay()));
             setUiPlayPause();
 
         }
@@ -229,7 +227,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+
     private void initViewPager() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), 6);
@@ -316,7 +314,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             if (intent.getAction().equals(PlayTrackService.TOGGLEPAUSE_ACTION)) {
 
-               setUiPlayPause();
+                setUiPlayPause();
             }
         }
     }
@@ -347,6 +345,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onResume();
         setUiPlayPause();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
