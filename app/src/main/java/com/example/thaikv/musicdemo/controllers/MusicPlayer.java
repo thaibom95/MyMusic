@@ -78,6 +78,12 @@ public class MusicPlayer {
         }
     }
 
+    public static void prev() {
+        if (mService != null) {
+            mService.preveSongService();
+        }
+    }
+
     public static boolean setPlaylist(ArrayList<SongMusicStruct> lisSong){
         if(mService != null){
             mService.setListSongPlay(lisSong);

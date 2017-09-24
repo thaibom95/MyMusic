@@ -269,8 +269,6 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             return;
         }
 
-        Intent in = new Intent(START_PLAY_NEW_SONG);
-        sendBroadcast(in);
 
         mediaPlayer.reset();
 
@@ -307,11 +305,14 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             mediaPlayer.seekTo(playBackCurrentPos);
             mediaPlayer.start();
         }
+        updateNotification();
     }
 
     public void pauseSongService() {
         playBackCurrentPos = mediaPlayer.getCurrentPosition();
         mediaPlayer.pause();
+        updateNotification();
+
     }
 
     public boolean isPlayingSong() {
@@ -390,6 +391,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     public void onPrepared(MediaPlayer mediaPlayer) {
 
         mediaPlayer.start();
+        Intent in = new Intent(START_PLAY_NEW_SONG);
+        sendBroadcast(in);
         updateNotification();
 
     }
@@ -468,7 +471,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                         "",
                         retrievePlaybackAction(NEXT_ACTION))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setPriority(NotificationManager.IMPORTANCE_HIGH)
-                .setUsesChronometer(true).setAutoCancel(false);
+                .setUsesChronometer(true).setAutoCancel(false).setOngoing(true);
 
         if (Utils.isJellyBeanMR1()) {
             builder.setShowWhen(false);
@@ -560,7 +563,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             } else {
                 playBackSongService();
             }
-            updateNotification();
+
         } else if (REPEAT_ACTION.equals(action)) {
             cycleRepeat();
         } else if (SHUFFLE_ACTION.equals(action)) {

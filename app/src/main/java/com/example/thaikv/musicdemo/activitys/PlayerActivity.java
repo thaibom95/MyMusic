@@ -21,6 +21,7 @@ import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.controllers.MusicPlayer;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.services.PlayTrackService;
+import com.example.thaikv.musicdemo.utils.NavigationUtils;
 import com.example.thaikv.musicdemo.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -53,8 +54,12 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         initViews();
         initDataSong();
         initEvents();
-        IntentFilter filter = new IntentFilter(PlayTrackService.START_PLAY_NEW_SONG);
-        registerReceiver(receivSong,filter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PlayTrackService.TOGGLEPAUSE_ACTION);
+        filter.addAction(PlayTrackService.START_PLAY_NEW_SONG);
+        filter.addAction(PlayTrackService.NEXT_ACTION);
+        filter.addAction(PlayTrackService.PREVIOUS_ACTION);
+        registerReceiver(receivSong, filter);
     }
 
     @Override
@@ -64,8 +69,8 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initViews() {
-        mBlurredArt = (ImageView)findViewById(R.id.mBlurredArt);
-        img_album = (ImageView)findViewById(R.id.img_album);
+        mBlurredArt = (ImageView) findViewById(R.id.mBlurredArt);
+        img_album = (ImageView) findViewById(R.id.img_album);
         ivBack = (ImageView) findViewById(R.id.iv_back);
         ivShuffle = (ImageView) findViewById(R.id.iv_shuffle);
         ivPrevious = (ImageView) findViewById(R.id.iv_previous);
@@ -96,6 +101,10 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         currentTrack = MusicPlayer.getCurrentSongPlay();
         if (currentTrack == null)
             return;
+        overflowcounter = 0;
+        if (mUpdateProgress != null) {
+            sbProgress.removeCallbacks(mUpdateProgress);
+        }
         Picasso.with(this).load(Utils.getAlbumArtUri(currentTrack.getIdAlbum())).error(R.drawable.bgk_player_256).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -121,13 +130,11 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         tvCurrentTime.setText(Utils.formatTime(MusicPlayer.getCurrentPositionPlay()));
         tvTotalTime.setText(Utils.formatTime(currentTrack.getDuration()));
         long time = currentTrack.getDuration();
-        sbProgress.setMax((int)time);
+        sbProgress.setMax((int) time);
+        sbProgress.setProgress((int)(MusicPlayer.getCurrentPositionPlay()));
 
-        if (mUpdateProgress != null) {
-            sbProgress.removeCallbacks(mUpdateProgress);
-        }
-        sbProgress.postDelayed(mUpdateProgress, 10);
-
+        //setup ui first create
+        setUiPlayPause();
         sbProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -146,8 +153,6 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
 
             }
         });
-
-
 
 
     }
@@ -176,7 +181,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         }
     };
 
-    private void setDefaultImage(){
+    private void setDefaultImage() {
         img_album.setImageResource(R.drawable.bgk_player_256);
         Bitmap bg_default = BitmapFactory.decodeResource(getResources(), R.drawable.bgk_player_256);
         setBlurredAlbumArt blurredAlbumArt = new setBlurredAlbumArt();
@@ -195,15 +200,15 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
                 break;
 
             case R.id.iv_previous:
-
+                actionPreve();
                 break;
 
             case R.id.iv_play_pause:
-
+                actionTongglePause();
                 break;
 
             case R.id.iv_next:
-
+                actionNext();
                 break;
 
             case R.id.iv_repeat:
@@ -213,6 +218,41 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    public void actionTongglePause() {
+        if (currentTrack == null)
+            return;
+
+        NavigationUtils.sendBroadCastWithAction(PlayerActivity.this, PlayTrackService.TOGGLEPAUSE_ACTION);
+
+    }
+
+    public void actionPreve() {
+        MusicPlayer.prev();
+    }
+
+    public void actionNext() {
+        MusicPlayer.next();
+
+    }
+
+
+    public void setUiPlayPause() {
+
+        if (MusicPlayer.isSongPlaying()) {
+            ivPlayPause.setImageResource(R.drawable.ic_pause_white_36dp);
+            ivPlayPause.setBackgroundResource(R.drawable.bgk_circle);
+            if (mUpdateProgress != null) {
+                sbProgress.removeCallbacks(mUpdateProgress);
+            }
+            sbProgress.postDelayed(mUpdateProgress, 10);
+        } else {
+            ivPlayPause.setImageResource(R.drawable.ic_play_white_36dp);
+            ivPlayPause.setBackgroundResource(R.drawable.bgk_circle_blue);
+            if (mUpdateProgress != null) {
+                sbProgress.removeCallbacks(mUpdateProgress);
+            }
+        }
+    }
 
     private class setBlurredAlbumArt extends AsyncTask<Bitmap, Void, Drawable> {
 
@@ -249,12 +289,25 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         protected void onPreExecute() {
         }
     }
-    private class ReceiveStartSong extends BroadcastReceiver{
+
+    private class ReceiveStartSong extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(PlayTrackService.START_PLAY_NEW_SONG)){
+            if (intent.getAction().equals(PlayTrackService.START_PLAY_NEW_SONG)) {
                 initDataSong();
+            }
+            if (intent.getAction().equals(PlayTrackService.TOGGLEPAUSE_ACTION)) {
+                setUiPlayPause();
+
+            }
+            if (intent.getAction().equals(PlayTrackService.PREVIOUS_ACTION)) {
+
+                //initDataSong();
+
+            }
+            if (intent.getAction().equals(PlayTrackService.NEXT_ACTION)) {
+              //  initDataSong();
             }
         }
     }

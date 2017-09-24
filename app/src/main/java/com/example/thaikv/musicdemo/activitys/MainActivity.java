@@ -1,10 +1,13 @@
 package com.example.thaikv.musicdemo.activitys;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -27,6 +30,7 @@ import com.example.thaikv.musicdemo.adapters.ViewPagerAdapter;
 import com.example.thaikv.musicdemo.controllers.MusicPlayer;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.services.PlayTrackService;
+import com.example.thaikv.musicdemo.utils.NavigationUtils;
 import com.example.thaikv.musicdemo.utils.Utils;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.squareup.picasso.Picasso;
@@ -50,12 +54,27 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private SongMusicStruct currentSong;
     int overflowcounter = 0;
 
+    ServiceConnection serviceConnect = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if(MusicPlayer.mService == null){
+            MusicPlayer.ServiceToken mToken = MusicPlayer.bindToService(this,serviceConnect);
+        }
         initViews();
     }
+
 
     @Override
     protected void onDestroy() {
@@ -70,7 +89,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         initNavigation();
         initViewPager();
         initTabs();
-        IntentFilter filter = new IntentFilter(PlayTrackService.START_PLAY_NEW_SONG);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PlayTrackService.TOGGLEPAUSE_ACTION);
+        filter.addAction(PlayTrackService.START_PLAY_NEW_SONG);
+        filter.addAction(PlayTrackService.PREVIOUS_ACTION);
+        filter.addAction(PlayTrackService.NEXT_ACTION);
         registerReceiver(receivSong, filter);
     }
 
@@ -96,12 +119,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public void onClick(View view) {
                 if (currentSong == null)
                     return;
-                if(MusicPlayer.isSongPlaying()){
-                    iv_play_pause.setImageResource(R.drawable.ic_play_white_36dp);
-                }else {
-                    iv_play_pause.setImageResource(R.drawable.ic_pause_white_36dp);
-                }
-                MusicPlayer.playOrPause();
+                NavigationUtils.sendBroadCastWithAction(MainActivity.this, PlayTrackService.TOGGLEPAUSE_ACTION);
 
             }
         });
@@ -128,15 +146,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             iv_play_pause.setEnabled(true);
             long time = currentSong.getDuration();
             progressBarPlay.setMax((int) time);
-            progressBarPlay.setProgress(0);
+            progressBarPlay.setProgress((int)(MusicPlayer.getCurrentPositionPlay()));
+            setUiPlayPause();
+
+        }
+    }
+
+
+    public void setUiPlayPause() {
+
+        if (MusicPlayer.isSongPlaying()) {
+            iv_play_pause.setImageResource(R.drawable.ic_pause_white_36dp);
             if (mUpdateProgress != null) {
                 progressBarPlay.removeCallbacks(mUpdateProgress);
             }
             progressBarPlay.postDelayed(mUpdateProgress, 10);
-            if(MusicPlayer.isSongPlaying()){
-                iv_play_pause.setImageResource(R.drawable.ic_play_white_36dp);
-            }else {
-                iv_play_pause.setImageResource(R.drawable.ic_pause_white_36dp);
+        } else {
+            iv_play_pause.setImageResource(R.drawable.ic_play_white_36dp);
+            if (mUpdateProgress != null) {
+                progressBarPlay.removeCallbacks(mUpdateProgress);
             }
         }
     }
@@ -241,6 +269,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 getCurrentSongAndSetup();
 
             }
+
+            if (intent.getAction().equals(PlayTrackService.TOGGLEPAUSE_ACTION)) {
+
+               setUiPlayPause();
+            }
         }
     }
 
@@ -264,4 +297,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setUiPlayPause();
+    }
 }
