@@ -54,6 +54,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     public static final String SHUFFLE_ACTION = PREFIX + "shuffle";
 
     public static final String START_PLAY_NEW_SONG = PREFIX + "start_play_new_song";
+    public static final int NOTIFICATION_ID = 1;
 
 
     //repeat mode
@@ -122,7 +123,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                     if (mediaPlayer != null)
                         initPlayer();
                     else if (!mediaPlayer.isPlaying()) {
-                        playSongService();
+                        playBackSongService();
+
                     }
                     mediaPlayer.setVolume(1.0f, 1.0f);
                     break;
@@ -139,8 +141,10 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS:
                     // Lost audio focus, probably "permanently"
-                    if (mediaPlayer.isPlaying())
+                    if (mediaPlayer.isPlaying()) {
+                        pauseSongService();
                         mediaPlayer.stop();
+                    }
                     mediaPlayer.release();
                     mediaPlayer = null;
                     break;
@@ -327,6 +331,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void nextSongService() {
+        if(listSongPlay == null)
+            return;
         if (indexSong < listSongPlay.size() - 1) {
             indexSong++;
         } else
@@ -337,6 +343,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void preveSongService() {
+        if(listSongPlay == null)
+            return;
         if (indexSong > 0) {
             indexSong--;
         } else
@@ -497,7 +505,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
 
     private void updateNotification() {
-        int notificationId = hashCode();
+//        int notificationId = hashCode();
+        int notificationId = NOTIFICATION_ID;
 
 //        startForeground(notificationId, buildNotification());
         mNotificationManager.notify(notificationId, buildNotification());
@@ -538,7 +547,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
     private void cancelNotification() {
         stopForeground(true);
-        mNotificationManager.cancel(hashCode());
+        mNotificationManager.cancel(NOTIFICATION_ID);
         mNotificationPostTime = 0;
         mNotifyMode = NOTIFY_MODE_NONE;
     }
