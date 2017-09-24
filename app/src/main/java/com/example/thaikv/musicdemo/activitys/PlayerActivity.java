@@ -54,6 +54,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         initViews();
+        setDefaultImage();
         initDataSong();
         initEvents();
         IntentFilter filter = new IntentFilter();
@@ -61,6 +62,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         filter.addAction(PlayTrackService.START_PLAY_NEW_SONG);
         filter.addAction(PlayTrackService.NEXT_ACTION);
         filter.addAction(PlayTrackService.PREVIOUS_ACTION);
+        filter.addAction(PlayTrackService.PAUSE_MUSIC);
         registerReceiver(receivSong, filter);
     }
 
@@ -110,7 +112,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         if (mUpdateProgress != null) {
             sbProgress.removeCallbacks(mUpdateProgress);
         }
-        Picasso.with(this).load(Utils.getAlbumArtUri(currentTrack.getIdAlbum())).error(R.drawable.bgk_player_256).into(new Target() {
+        Picasso.with(this).load(Utils.getAlbumArtUri(currentTrack.getIdAlbum())).error(R.drawable.music_default_big).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 img_album.setImageBitmap(bitmap);
@@ -187,7 +189,7 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
     };
 
     private void setDefaultImage() {
-        img_album.setImageResource(R.drawable.bgk_player_256);
+        img_album.setImageResource(R.drawable.music_default_big);
         Bitmap bg_default = BitmapFactory.decodeResource(getResources(), R.drawable.bgk_player_256);
         setBlurredAlbumArt blurredAlbumArt = new setBlurredAlbumArt();
         blurredAlbumArt.execute(bg_default);
@@ -306,9 +308,9 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
                 setUiPlayPause();
 
             }
-            if (intent.getAction().equals(PlayTrackService.PREVIOUS_ACTION)) {
+            if (intent.getAction().equals(PlayTrackService.PAUSE_MUSIC)) {
 
-                //initDataSong();
+                setUiPlayPause();
 
             }
             if (intent.getAction().equals(PlayTrackService.NEXT_ACTION)) {

@@ -102,7 +102,7 @@
 
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/bgk_player_256" />
+                        android:src="@drawable/music_default_big" />
                 </android.support.v7.widget.CardView>
 
 
@@ -260,6 +260,8 @@
                         android:layout_height="0dp"
                         android:layout_above="@+id/tv_artist"
                         android:layout_marginBottom="4dp"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:gravity="center"
@@ -279,6 +281,8 @@
                         android:gravity="center"
                         android:maxLines="1"
                         android:text="Chu Bin"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
                         android:textColor="@color/colorTextTitle"
                         android:textSize="14sp" />
                 </LinearLayout>

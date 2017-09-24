@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import android.content.Intent;
 
+import com.example.thaikv.musicdemo.activitys.MainActivity;
 import com.example.thaikv.musicdemo.activitys.PlayerActivity;
 import com.example.thaikv.musicdemo.controllers.MusicPlayer;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
@@ -52,6 +53,14 @@ public class TracksFragment extends BaseFragment<SongMusicStruct> implements Tra
         arrayList = tracksArrayList;
         baseAdapter.setArrayList(arrayList);
         baseAdapter.notifyDataSetChanged();
+        if (MusicPlayer.getCurrentSongPlay() == null) {
+            //LIST TRACK NULL
+            if (tracksArrayList != null && tracksArrayList.size() > 0) {
+                MusicPlayer.setPlaylist(tracksArrayList);
+                ((MainActivity) getContext()).getCurrentSongAndSetup();
+            }
+
+        }
     }
 
     @Override

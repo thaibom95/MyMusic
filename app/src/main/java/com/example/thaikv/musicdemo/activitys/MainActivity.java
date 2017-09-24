@@ -36,12 +36,15 @@ import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
 import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.adapters.ViewPagerAdapter;
 import com.example.thaikv.musicdemo.controllers.MusicPlayer;
+import com.example.thaikv.musicdemo.fragments.TracksFragment;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.services.PlayTrackService;
 import com.example.thaikv.musicdemo.utils.NavigationUtils;
 import com.example.thaikv.musicdemo.utils.Utils;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -66,19 +69,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private SongMusicStruct currentSong;
     int overflowcounter = 0;
     private LinearLayout lnlParentPlayerMini;
+    ViewPagerAdapter viewPagerAdapter;
 
-    ServiceConnection serviceConnect = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            getCurrentSongAndSetup();
-        }
-
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
+//    ServiceConnection serviceConnect = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//
+//        }
+//
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName componentName) {
+//
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +115,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void initViews() {
         if (MusicPlayer.mService == null) {
-            MusicPlayer.ServiceToken mToken = MusicPlayer.bindToService(this, serviceConnect);
+            MusicPlayer.ServiceToken mToken = MusicPlayer.bindToService(this, this);
         }
         initToolbar();
         initFloatingButton();
@@ -125,9 +129,41 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         filter.addAction(PlayTrackService.START_PLAY_NEW_SONG);
         filter.addAction(PlayTrackService.PREVIOUS_ACTION);
         filter.addAction(PlayTrackService.NEXT_ACTION);
+        filter.addAction(PlayTrackService.PAUSE_MUSIC);
         registerReceiver(receivSong, filter);
 
         initPlayerMini();
+        setDataMusicForService();
+    }
+
+    public void setDataMusicForService() {
+        if (MusicPlayer.mService != null) {
+            if (MusicPlayer.getCurrentSongPlay() == null && viewPagerAdapter != null) {
+                TracksFragment fm_track = (TracksFragment) viewPagerAdapter.getItem(0);
+                ArrayList<SongMusicStruct> listTrack = fm_track.getListData();
+                //LIST TRACK NULL
+                if (listTrack != null && listTrack.size() > 0) {
+                    MusicPlayer.setPlaylist(listTrack);
+                    getCurrentSongAndSetup();
+                }
+
+            }else {
+                getCurrentSongAndSetup();
+            }
+        }
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        super.onServiceConnected(componentName, iBinder);
+        setDataMusicForService();
+
+
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+        super.onServiceDisconnected(componentName);
     }
 
     private void initToolbar() {
@@ -230,7 +266,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void initViewPager() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), 6);
+        viewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), 6);
 
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.addOnPageChangeListener(this);
@@ -312,7 +348,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             }
 
-            if (intent.getAction().equals(PlayTrackService.TOGGLEPAUSE_ACTION)) {
+            if (intent.getAction().equals(PlayTrackService.TOGGLEPAUSE_ACTION) || intent.getAction().equals(PlayTrackService.PAUSE_MUSIC)) {
 
                 setUiPlayPause();
             }

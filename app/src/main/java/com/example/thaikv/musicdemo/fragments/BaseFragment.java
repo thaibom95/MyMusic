@@ -88,6 +88,9 @@ public abstract class BaseFragment<T> extends Fragment implements BaseAdapter.On
     protected abstract void initData();
 
     protected abstract void onClickItemListenerBase(int position);
+    public ArrayList<T>  getListData(){
+        return arrayList;
+    }
 
     @Override
     public void onClickItemListener(int position) {

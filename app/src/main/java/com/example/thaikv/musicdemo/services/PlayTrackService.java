@@ -49,9 +49,11 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
     public static final String NEXT_ACTION = PREFIX + "next";
     public static final String TOGGLEPAUSE_ACTION = PREFIX + "togglepause";
+    public static final String PAUSE_MUSIC = PREFIX + "pause";
 
     public static final String REPEAT_ACTION = PREFIX + "repeat";
     public static final String SHUFFLE_ACTION = PREFIX + "shuffle";
+    public static final String DELETE_NOTI_ACTION = PREFIX + "DELETE_NOTI";
 
     public static final String START_PLAY_NEW_SONG = PREFIX + "start_play_new_song";
     public static final int NOTIFICATION_ID = 1;
@@ -94,6 +96,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     private int typeCurrentListSongs = -1;
     private int playBackCurrentPos = 0;
     private AudioManager mAudioManager;
+    Boolean notShowNoti = false;
 
     private MusicIntentReceiver receiverHeadphone = new MusicIntentReceiver();
 
@@ -173,6 +176,9 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
     public void setListSongPlay(ArrayList<SongMusicStruct> listSongPlay) {
         this.listSongPlay = listSongPlay;
+        indexSong = 0;
+        if (listSongPlay.size() > 0)
+            songPlay = listSongPlay.get(indexSong);
 
     }
 
@@ -212,6 +218,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
         filter.addAction(PREVIOUS_FORCE_ACTION);
         filter.addAction(REPEAT_ACTION);
         filter.addAction(SHUFFLE_ACTION);
+        filter.addAction(DELETE_NOTI_ACTION);
         // Attach the broadcast listener
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -249,16 +256,16 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
 
 
     public SongMusicStruct getCurrenSongPlay() {
-        if(listSongPlay == null || listSongPlay.size() == 0)
-            return  null;
+        if (listSongPlay == null || listSongPlay.size() == 0)
+            return null;
         if (songPlay == null) {
             songPlay = listSongPlay.get(indexSong);
         }
         return songPlay;
     }
 
-    public void  seekSongPlayTo(int s){
-        if(mediaPlayer != null){
+    public void seekSongPlayTo(int s) {
+        if (mediaPlayer != null) {
             mediaPlayer.seekTo(s);
         }
     }
@@ -315,7 +322,13 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     public void pauseSongService() {
         playBackCurrentPos = mediaPlayer.getCurrentPosition();
         mediaPlayer.pause();
-        updateNotification();
+
+        if (notShowNoti) {
+            notShowNoti = false;
+        } else {
+            updateNotification();
+        }
+
 
     }
 
@@ -331,7 +344,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void nextSongService() {
-        if(listSongPlay == null)
+        if (listSongPlay == null)
             return;
         if (indexSong < listSongPlay.size() - 1) {
             indexSong++;
@@ -343,7 +356,7 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     public void preveSongService() {
-        if(listSongPlay == null)
+        if (listSongPlay == null)
             return;
         if (indexSong > 0) {
             indexSong--;
@@ -413,9 +426,9 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
     }
 
     private Notification buildNotification() {
-        if(listSongPlay == null || listSongPlay.size() == 0)
+        if (listSongPlay == null || listSongPlay.size() == 0)
             return null;
-        if(songPlay == null)
+        if (songPlay == null)
             songPlay = listSongPlay.get(indexSong);
         final String albumName = songPlay.getAlbum();
         final String artistName = songPlay.getArtist();
@@ -479,7 +492,8 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
                         "",
                         retrievePlaybackAction(NEXT_ACTION))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setPriority(NotificationManager.IMPORTANCE_HIGH)
-                .setUsesChronometer(true).setAutoCancel(false).setOngoing(true);
+                .setUsesChronometer(true).setAutoCancel(false)
+                .setDeleteIntent(retrievePlaybackAction(DELETE_NOTI_ACTION));
 
         if (Utils.isJellyBeanMR1()) {
             builder.setShowWhen(false);
@@ -577,6 +591,12 @@ public class PlayTrackService extends Service implements MediaPlayer.OnPreparedL
             cycleRepeat();
         } else if (SHUFFLE_ACTION.equals(action)) {
             cycleShuffle();
+        } else if (DELETE_NOTI_ACTION.equals(action)) {
+            if (mediaPlayer != null) {
+                notShowNoti = true;
+                pauseSongService();
+                sendBroadcast(new Intent(PAUSE_MUSIC));
+            }
         }
     }
 
