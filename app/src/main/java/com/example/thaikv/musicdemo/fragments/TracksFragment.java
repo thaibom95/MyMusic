@@ -53,14 +53,14 @@ public class TracksFragment extends BaseFragment<SongMusicStruct> implements Tra
         arrayList = tracksArrayList;
         baseAdapter.setArrayList(arrayList);
         baseAdapter.notifyDataSetChanged();
-        if (MusicPlayer.getCurrentSongPlay() == null) {
-            //LIST TRACK NULL
-            if (tracksArrayList != null && tracksArrayList.size() > 0) {
-                MusicPlayer.setPlaylist(tracksArrayList);
-                ((MainActivity) getContext()).getCurrentSongAndSetup();
-            }
-
-        }
+//        if (MusicPlayer.getCurrentSongPlay() == null) {
+//            //LIST TRACK NULL
+//            if (tracksArrayList != null && tracksArrayList.size() > 0) {
+//                MusicPlayer.setPlaylist(tracksArrayList);
+//                ((MainActivity) getContext()).getCurrentSongAndSetup();
+//            }
+//
+//        }
     }
 
     @Override

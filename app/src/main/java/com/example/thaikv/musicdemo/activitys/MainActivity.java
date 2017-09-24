@@ -132,31 +132,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         filter.addAction(PlayTrackService.PAUSE_MUSIC);
         registerReceiver(receivSong, filter);
 
-        initPlayerMini();
-        setDataMusicForService();
-    }
 
-    public void setDataMusicForService() {
-        if (MusicPlayer.mService != null) {
-            if (MusicPlayer.getCurrentSongPlay() == null && viewPagerAdapter != null) {
-                TracksFragment fm_track = (TracksFragment) viewPagerAdapter.getItem(0);
-                ArrayList<SongMusicStruct> listTrack = fm_track.getListData();
-                //LIST TRACK NULL
-                if (listTrack != null && listTrack.size() > 0) {
-                    MusicPlayer.setPlaylist(listTrack);
-                    getCurrentSongAndSetup();
-                }
 
-            }else {
-                getCurrentSongAndSetup();
-            }
-        }
     }
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         super.onServiceConnected(componentName, iBinder);
-        setDataMusicForService();
+        getCurrentSongAndSetup();
 
 
     }
@@ -199,6 +182,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void getCurrentSongAndSetup() {
         currentSong = MusicPlayer.getCurrentSongPlay();
         if (currentSong == null) {
+            initPlayerMini(View.GONE);
             tv_name_song.setText("");
             tv_artist.setText("");
             progressBarPlay.setMax(100);
@@ -208,6 +192,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
         } else {
+            initPlayerMini(View.VISIBLE);
             Picasso.with(this).load(Utils.getAlbumArtUri(currentSong.getIdAlbum())).error(R.drawable.bgk_player_256).into(civ_thumbnail);
             tv_name_song.setText(currentSong.getName());
             tv_artist.setText(currentSong.getArtist());
@@ -280,9 +265,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         smartTabLayout.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
     }
 
-    private void initPlayerMini() {
+    private void initPlayerMini(int show) {
         lnlParentPlayerMini = (LinearLayout) findViewById(R.id.lnl_parent_player_mini);
-        lnlParentPlayerMini.setVisibility(View.VISIBLE);
+        lnlParentPlayerMini.setVisibility(show);
     }
 
 
