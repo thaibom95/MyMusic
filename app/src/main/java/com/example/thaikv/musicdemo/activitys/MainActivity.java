@@ -1,5 +1,6 @@
 package com.example.thaikv.musicdemo.activitys;
 
+
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,13 +9,18 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +29,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
 import com.example.thaikv.musicdemo.R;
@@ -38,6 +46,10 @@ import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
+    private static String TAG = "MainActivity";
+    private static final int REQUEST_CODE_PERMISSION = 100;
+
+
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private DrawerLayout drawer;
@@ -53,12 +65,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private BroadcastReceiver receivSong = new ReceiveStartSong();
     private SongMusicStruct currentSong;
     int overflowcounter = 0;
+    private LinearLayout lnlParentPlayerMini;
 
     ServiceConnection serviceConnect = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 
         }
+
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
@@ -76,12 +90,30 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receivSong);
+        checkPermissions();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                initViews();
+            } else {
+                String[] permission = new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                };
+                ActivityCompat.requestPermissions(this, permission, REQUEST_CODE_PERMISSION);
+            }
+        } else {
+            initViews();
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void initViews() {
         initToolbar();
         initFloatingButton();
@@ -89,12 +121,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         initNavigation();
         initViewPager();
         initTabs();
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(PlayTrackService.TOGGLEPAUSE_ACTION);
         filter.addAction(PlayTrackService.START_PLAY_NEW_SONG);
         filter.addAction(PlayTrackService.PREVIOUS_ACTION);
         filter.addAction(PlayTrackService.NEXT_ACTION);
         registerReceiver(receivSong, filter);
+
+        initPlayerMini();
     }
 
     private void initToolbar() {
@@ -180,6 +215,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void initDrawerLayout() {
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -193,6 +229,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void initViewPager() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), 6);
@@ -203,14 +240,19 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         viewPager.setPageTransformer(true, new ZoomOutSlideTransformer());
     }
 
-
     private void initTabs() {
         smartTabLayout = (SmartTabLayout) findViewById(R.id.tabLayout);
         smartTabLayout.setViewPager(viewPager);
         smartTabLayout.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
     }
 
+    private void initPlayerMini() {
+        lnlParentPlayerMini = (LinearLayout) findViewById(R.id.lnl_parent_player_mini);
+        lnlParentPlayerMini.setVisibility(View.VISIBLE);
+    }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -237,6 +279,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return super.onOptionsItemSelected(item);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -260,6 +303,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onPageScrollStateChanged(int state) {
 
     }
+
 
     private class ReceiveStartSong extends BroadcastReceiver {
 
@@ -303,4 +347,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onResume();
         setUiPlayPause();
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initViews();
+                } else {
+                    finish();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
 }

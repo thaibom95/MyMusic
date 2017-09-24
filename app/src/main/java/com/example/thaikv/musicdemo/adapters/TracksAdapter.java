@@ -1,6 +1,7 @@
 package com.example.thaikv.musicdemo.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +13,12 @@ import android.widget.TextView;
 import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.models.SongMusicStruct;
 import com.example.thaikv.musicdemo.utils.Utils;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 public class TracksAdapter extends BaseAdapter<SongMusicStruct, TracksAdapter.TracksViewHolder> {
-    public TracksAdapter(Context context, RecyclerView recyclerView) {
+    public TracksAdapter(Context context, FastScrollRecyclerView recyclerView) {
         super(context, recyclerView);
     }
 
@@ -37,6 +39,12 @@ public class TracksAdapter extends BaseAdapter<SongMusicStruct, TracksAdapter.Tr
     @Override
     public TracksViewHolder createBaseViewHolder(ViewGroup parent, LayoutInflater layoutInflater) {
         return new TracksViewHolder(layoutInflater.inflate(R.layout.item_tracks, parent, false));
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return getArrayList().get(position).getName().charAt(0) + "";
     }
 
     class TracksViewHolder extends RecyclerView.ViewHolder {

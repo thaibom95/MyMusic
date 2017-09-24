@@ -1,6 +1,7 @@
 package com.example.thaikv.musicdemo.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.thaikv.musicdemo.R;
 import com.example.thaikv.musicdemo.models.AlbumMusicStruct;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AlbumsAdapter extends BaseAdapter<AlbumMusicStruct, AlbumsAdapter.AlbumsViewHolder> {
-    public AlbumsAdapter(Context context, RecyclerView recyclerView) {
+    public AlbumsAdapter(Context context, FastScrollRecyclerView recyclerView) {
         super(context, recyclerView);
     }
 
@@ -36,7 +38,7 @@ public class AlbumsAdapter extends BaseAdapter<AlbumMusicStruct, AlbumsAdapter.A
 
         Picasso.with(context)
                 .load(arrayList.get(position).getUriThumbnail())
-                .placeholder(R.drawable.ic_music_default)
+                .placeholder(R.drawable.ic_music_default_small_new)
                 .fit()
                 .centerCrop()
                 .into(holder.civThumbnail);
@@ -45,6 +47,12 @@ public class AlbumsAdapter extends BaseAdapter<AlbumMusicStruct, AlbumsAdapter.A
     @Override
     public AlbumsViewHolder createBaseViewHolder(ViewGroup parent, LayoutInflater layoutInflater) {
         return new AlbumsViewHolder(layoutInflater.inflate(R.layout.item_albums, parent, false));
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return getArrayList().get(position).getName().charAt(0) + "";
     }
 
     class AlbumsViewHolder extends RecyclerView.ViewHolder {

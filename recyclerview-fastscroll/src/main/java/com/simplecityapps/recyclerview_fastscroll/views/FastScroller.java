@@ -54,6 +54,7 @@ public class FastScroller {
 
     private int mThumbHeight;
     private int mWidth;
+    // Tu them vao
     private int mWidthTrack;
 
     private Paint mThumb;
@@ -84,6 +85,7 @@ public class FastScroller {
     private int mThumbActiveColor;
     private final int mThumbInactiveColor = 0x79000000;
     private boolean mThumbInactiveState;
+
 
     @Retention(SOURCE)
     @IntDef({FastScrollerPopupPosition.ADJACENT, FastScrollerPopupPosition.CENTER})
@@ -124,7 +126,8 @@ public class FastScroller {
             @FastScrollerPopupPosition int popupPosition = typedArray.getInteger(R.styleable.FastScrollRecyclerView_fastScrollPopupPosition, FastScrollerPopupPosition.ADJACENT);
 
 //            mTrack.setColor(trackColor);
-            mTrack.setColor(Color.WHITE);
+            // Thay doi mau thanh FastScroll
+            mTrack.setColor(Color.parseColor("#848484"));
             mThumb.setColor(mThumbInactiveState ? mThumbInactiveColor : mThumbActiveColor);
             mPopup.setBgColor(popupBgColor);
             mPopup.setTextColor(popupTextColor);

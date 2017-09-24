@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/bgk_nav_bar"
+    android:background="@drawable/bgk_nav_bar_new"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <LinearLayout
@@ -16,7 +16,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_app_128" />
+            android:src="@drawable/ic_app_128_new" />
 
         <TextView
             android:layout_width="wrap_content"

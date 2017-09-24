@@ -1,5 +1,6 @@
 package com.example.thaikv.musicdemo.activitys;
 
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +10,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
+
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ import com.example.thaikv.musicdemo.utils.NavigationUtils;
 import com.example.thaikv.musicdemo.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
 
 public class PlayerActivity extends BaseActivity implements View.OnClickListener {
     private ImageView ivBack;
@@ -69,8 +71,10 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initViews() {
+
         mBlurredArt = (ImageView) findViewById(R.id.mBlurredArt);
         img_album = (ImageView) findViewById(R.id.img_album);
+
         ivBack = (ImageView) findViewById(R.id.iv_back);
         ivShuffle = (ImageView) findViewById(R.id.iv_shuffle);
         ivPrevious = (ImageView) findViewById(R.id.iv_previous);
@@ -85,7 +89,8 @@ public class PlayerActivity extends BaseActivity implements View.OnClickListener
         tvTotalTime = (TextView) findViewById(R.id.tv_total_time);
 
         sbProgress = (SeekBar) findViewById(R.id.skb_progress);
-        setDefaultImage();
+        //setDefaultImage();
+
     }
 
     private void initEvents() {
